@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>JavaScript</title>
+</head>
+
+<body>
+    <h1>Логические операторы</h1>
+    <script>
+        let dohod = 567;
+        let nalog = 0;
+        if (dohod > 180 && dohod <= 500) {
+            nalog = dohod * 0.01;
+        }
+        else if (dohod > 500 && dohod <= 2500) {
+            nalog = dohod * 0.02;
+        }
+        else if (dohod > 2500) {
+            nalog = dohod * 0.03;
+        }
+        alert("Подоходный налог составит " + nalog + " у.е.");
+    </script>
+</body>
+
+</html>

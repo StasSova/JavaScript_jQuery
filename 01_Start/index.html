@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>First programm on JavaScript 1</h1>
+    <!-- TASK 1 -->
+    <!-- <script>
+        let name = prompt("Введите ваше имя");
+        let gender = prompt("Введите ваш пол", "M|W,")
+        let age = parseInt(prompt("Введите ваш возраст"));
+        age = isNaN(age) ? -1 : age 
+        let e_mail = prompt("Введите вашу почту");
+        confirm(`FullName: ${name}\nGender: ${gender}\nAge: ${age}\nE-mail: ${e_mail}`);
+    </script> -->
+
+    <!-- TASK 2 -->
+    <!-- <script>
+        let number = prompt("Введите номер трамвайного билета");
+        number.length == 6
+            ? alert(`Result: ${(parseInt(number[0]) + parseInt(number[1]) +parseInt(number[2])) == (parseInt(number[3]) + parseInt(number[4]) +parseInt(number[5]))}`)
+            : alert("Incorrect input key")
+        
+    </script> -->
+
+    <!-- TASK 3 -->
+    <!-- <script>
+        let min = 0;
+        let max = 100;
+        let end = false;
+        let guess;
+
+        while (!end) {
+            guess = Math.floor((min + max) / 2); // округление к ближайшему меньшему целому > 4.9 -> 4
+            let response = prompt(`Ваше число > ${guess}, < ${guess} или == ${guess}?`);
+
+            switch(response){
+                case (">"): min = guess + 1; break;
+                case ("<"): min = guess - 1; break;
+                case ("=="): alert(`Ваше число равно ${guess}!`); end = true; break;
+                default: alert("Пожалуйста, введите >, < или ==.");
+            }
+
+            if (min > max) {
+                alert("Вы что-то сказали неправильно. Попробуйте снова.");
+                break;
+            }
+        }
+    </script> -->
+
+</body>
+
+</html>

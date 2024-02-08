@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>JavaScript</title>
+</head>
+
+<body>
+    <h1>Цикл FOR</h1>
+    <script>
+        let upperLimit = 20;
+        let counter;
+        let sum = 0;
+        for (counter = 1; counter <= upperLimit; counter++) {
+            sum += counter;
+        }
+        alert("Сумма чисел от 1 до " + upperLimit + ": " + sum);
+
+        outer: for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+
+                let input = prompt('Значение в координатах ' + i + ',' + j, '');
+
+                // если отмена ввода или пустая строка -
+                // завершить оба цикла
+                if (!input) break outer; // (*)
+
+            }
+        }
+        alert('Готово!');
+    </script>
+</body>
+
+</html>
