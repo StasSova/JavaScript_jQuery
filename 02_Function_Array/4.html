@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+          border-collapse: collapse;
+        }
+        td {
+          width: 50px;
+          height: 50px;
+          border: 1px solid black;
+        }
+        .black {
+          background-color: black;
+        }
+        .white {
+          background-color: gray;
+        }
+      </style>
+</head>
+<body>
+    <script>
+        document.write('<table id="chessboard"></table>');      // вносим в документ элемент
+        const boardSize = 8;                                   // размер доски
+        const board = document.getElementById('chessboard');    // получаем этот элемент по ID
+        for (let i = 0; i < boardSize; i++) {                   // проходимся по каждой строчке
+            const row = document.createElement('tr');           // создаем объект строки
+            for (let j = 0; j < boardSize; j++) {               // проходимся по каждому элементу строки и добавляем ей столбцы
+                const cell = document.createElement('td');      // создаем столбец для строки
+                // Определяем цвет клетки
+                cell.className = (i + j) % 2 === 0              // определяем цвет клетки
+                        ? 'white' 
+                        : 'black';
+                row.appendChild(cell);                          // добавляем к строке эту ячейку
+            }
+            board.appendChild(row);                             // к доске, добавляем строку
+        }
+    </script>
+</body>
+</html>

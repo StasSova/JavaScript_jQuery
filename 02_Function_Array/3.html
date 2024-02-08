@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let url = prompt("URL: ", "http://www.ufa.com.ua/utilites/hdd/out.php?sort=2");
+        // http
+        let Protocol = url.slice(0, url.indexOf('://'));    
+        // www.ufa.com.ua
+        let Host = url.slice(url.indexOf('://') + 3, url.indexOf('/', url.indexOf('://') + 3)); 
+        // /utilites/hdd/out.php?sort=2
+        let pathAndQuery = url.slice(url.indexOf('/', url.indexOf('://') + 3)); 
+        // out.php
+        let FileName = pathAndQuery.substring(pathAndQuery.lastIndexOf('/') + 1, pathAndQuery.indexOf('?') === -1 ? undefined : pathAndQuery.indexOf('?'));
+        // sort=2
+        let queryString = pathAndQuery.slice(pathAndQuery.indexOf('?') + 1);
+
+        let EndPoints = queryString.split('&').map(pair => pair.split('='));
+
+        document.write(`Protocol: ${Protocol}<br>`);
+        document.write(`Host: ${Host}<br>`);
+        document.write(`Full path: ${Host}<br>`);
+        document.write(`FileName: ${FileName}<br>`);
+        document.write(`tEndPoints:`);
+        for (el of EndPoints){
+            document.write(`${el[0]} = ${el[1]}<br>`);
+        }
+
+    </script>
+</body>
+</html>

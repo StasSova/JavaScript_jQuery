@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let questions = [
+            ["Вы любите кофе?", null],
+            ["Вы курили когда-либо?", null],
+            ["Вы пьете чай?", null],
+            ["У вас есть домашние животные?", null],
+            ["Вы любите путешествовать?", null],
+            ["Вы знаете английский язык?", null],
+            ["Вы ходите на работу пешком?", null],
+            ["Вы занимаетесь спортом?", null],
+            ["Вы читаете книги?", null],
+            ["Вы умеете готовить?", null]
+        ];
+
+        for (let i = 0; i < questions.length; i++) {
+            questions[i][1] = confirm(questions[i][0]);
+        }
+
+        // Вывод вопросов и ответов
+        for (let q of questions) {
+            document.write(q[0].fontcolor("aqua").bold() + " Ответ: ".fontcolor("grey") + (q[1] ? "Да".fontcolor("green").bold() : "Нет".fontcolor("red").bold()));
+            document.write("<br/>")
+        }
+    </script>
+</body>
+</html>
