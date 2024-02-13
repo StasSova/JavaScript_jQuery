@@ -7,16 +7,37 @@
     <style>
         table {
             border-collapse: collapse;
+            background-size: cover; /* Растягиваем изображение, чтобы оно полностью заполнило контейнер */
+            background-position: center; /* Центрируем изображение внутри контейнера */
+            background-repeat: no-repeat; /* Запрещаем повторение изображения */
         }
         th, td {
             border: 1px solid black;
             padding: 10px;
             text-align: center;
         }
-        .selectDay{
-            background-color: aqua;
+        th{
+            color: white;
+            background-color: rgba(0, 0, 0, 0.599);
         }
-
+        .selectDay{
+            background-color: rgba(0, 0, 0, 0);
+            border: 1px solid red;
+            color: white;
+        }
+        .notCurrentDate{
+            color: gray;
+            background-color: rgba(48, 48, 48, 0.599);
+        }
+        .currentDate{
+            color: white;
+            background-color: rgba(0, 0, 0, 0.599);
+        }
+        .winter{background-image: url("https://images.unsplash.com/photo-1545858908-bc6fee2bd44d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");}
+        .spring{background-image: url("https://images.unsplash.com/photo-1458941055256-4c1ba58abbc5?q=80&w=1073&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");}
+        .summer{background-image: url("https://images.unsplash.com/photo-1572953745960-14685e3e9b49?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");}
+        .autumn{background-image: url("https://images.unsplash.com/photo-1504788363733-507549153474?q=80&w=1167&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");}
+        .defaultImage{background-image: url("https://images.unsplash.com/photo-1707650042645-f4123aeef0b2?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");}
     </style>
 </head>
 <body>
@@ -27,7 +48,25 @@
         function createCalendar(year, month, day) {
             const monthNames = ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень","Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"];
             // Создаем объект текущей даты
-            const currentDate = new Date(year, month - 1);
+            const currentDate = new Date(year, month-1);
+            
+            //----------------------------------------------------------------
+            //              ИЗМЕНЕНИЕ ФОНА В СООТВЕТСТВИИ С ВРЕМЕНЕМ ГОДА
+            //----------------------------------------------------------------
+            
+            const currentMonth = currentDate.getMonth() + 1;
+            let season = '';
+            switch (currentMonth) {
+                case 12: case 1: case 2: season = 'winter'; break;
+                case 3: case 4: case 5: season = 'spring'; break;
+                case 6: case 7: case 8: season = 'summer'; break;
+                case 9: case 10: case 11: season = 'autumn'; break;
+                default: season = 'defaultImage'; // Если что-то пошло не так, установим летнюю картинку
+            }
+            //----------------------------------------------------------------
+            //              HTML РАЗМЕТКА
+            //----------------------------------------------------------------
+            
             // получаем полк-во дней в месяце. ставим 0, нас перекидывает на прошлый месяц, на день назад, т.е. на последнюю дату месяца.             
             const daysInMonth = new Date(year, month, 0).getDate();
             // Получаем первый день недели, текущего месяца. 0-вс/1-пн/2-вт..
@@ -37,19 +76,25 @@
                 firstDayOfMonth = 7;
             }
 
-            // HTML разметка. Начало...
             // для заголовка указываем месяц и год
             let calendarHTML = `<h3>${monthNames[month - 1]} ${year}</h3>`;
             // Создаем таблицу для нашего календаря
-            calendarHTML += "<table>";
+            calendarHTML += `<table class="${season}">`;
             // шапка таблицы с названиями дней недели
             calendarHTML += "<tr><th>Пн</th><th>Вт</th><th>Ср</th><th>Чт</th><th>Пт</th><th>Сб</th><th>Нд</th></tr>"; 
             // начало первой строки в таблице (с датой)
             calendarHTML += "<tr>";
 
             // Создаем пустые ячейки в календаре для дней, которые предшествуют первому дню указанного месяца.
-            for (let i = 1; i < firstDayOfMonth; i++) {
-                calendarHTML += "<td></td>";
+            // Получаем последний день предыдущего месяца
+            const lastDayOfPrevMonth = new Date(year, month - 1, 0).getDate(); 
+            // Находим день недели, с которого начинается месяц (0 - воскресенье, 1 - понедельник, ...)
+            const startDay = (firstDayOfMonth - 1 + 7) % 7; 
+            for (let i = startDay; i > 0; i--) {
+                // Получаем день предыдущего месяца для текущей ячейки
+                const prevDate = lastDayOfPrevMonth - i + 1; 
+                // Добавляем в таблицу ячейку с числом предыдущего месяца
+                calendarHTML += `<td class="notCurrentDate">${prevDate}</td>`; 
             }
 
             // заполнение дней месяца в ячейках
@@ -57,7 +102,7 @@
                 // ячейка с текущим днем недели
                 calendarHTML += _day === day
                     ? `<td class="selectDay">${_day}</td>`
-                    : `<td>${_day}</td>`;
+                    : `<td class="currentDate">${_day}</td>`;
                 // если если достигнуто воскресенья, тогда переход на новую строку
                 // -1 используется для смещения дня недели
                 if ((firstDayOfMonth + _day - 1) % 7 === 0) {
@@ -65,13 +110,11 @@
                 }
             }
 
-            // Заолняем осташиеся дни недели пробелами
-            // смотрим какой день недели
+            // Получаем день недели последнего дня текущего месяца
             const lastDayOfMonth = new Date(year, month - 1, daysInMonth).getDay();
-            // если это воскресенье, тогда 
             if (lastDayOfMonth !== 0) {
-                for (let i = lastDayOfMonth + 1; i <= 7; i++) {
-                    calendarHTML += "<td></td>"; // Порожня комірка
+                for (let i = 1; i <= 7 - lastDayOfMonth; i++) {
+                    calendarHTML += `<td class="notCurrentDate">${i}</td>`; // Добавляем числа следующего месяца
                 }
             }
 
@@ -82,14 +125,16 @@
 
             return calendarHTML;
         }
+        // Получаем данные от пользователя через prompt
+        const year = parseInt(prompt("Введите год (например, 2024):"));
+        const month = parseInt(prompt("Введите номер месяца (от 1 до 12):"));
+        const day = parseInt(prompt("Введите число (от 1 до 31):"));
 
-        
-        const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth() + 1;
-        const SelectDate = 20;
-
-        document.getElementById("calendar").innerHTML = createCalendar(currentYear, currentMonth, SelectDate);
+        if (isNaN(year) || isNaN(month) || isNaN(day) || month < 1 || month > 12 || day < 1 || day > 31) {
+            alert("Пожалуйста, введите корректные данные.");
+        } else {
+            document.getElementById("calendar").innerHTML = createCalendar(year, month, day);
+        }
     </script>
 </body>
 </html>
