@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O`Clock</title>
+</head>
+<style>
+    .main{
+        margin: 10%;
+        text-align: center;
+        vertical-align: center;
+
+        display: grid;
+        grid-template-columns: repeat(8,1fr);
+        gap: 4px;
+    }
+</style>
+<body>
+    <div class="main">
+        <img id="h_1"  alt="">
+        <img id="h_2"  alt="">
+        <img id="sep_1" src="img/points.gif" alt="">
+        <img id="m_1"  alt="">
+        <img id="m_2"  alt="">
+        <img id="sep_2" src="img/points.gif" alt="">
+        <img id="s_1"  alt="">
+        <img id="s_2"  alt="">
+    </div>
+    <script>
+        let img = ["img/0.gif", "img/1.gif", "img/2.gif", "img/3.gif", "img/4.gif", "img/5.gif", "img/6.gif", "img/7.gif", "img/8.gif", "img/9.gif", "img/blank.gif", "img/points.gif"];
+        let splash = false;
+        function updateTime() {
+            let currentTime = new Date();
+            let hours = currentTime.getHours();
+            let minutes = currentTime.getMinutes();
+            let seconds = currentTime.getSeconds();
+
+            document.getElementById("h_1").src = img[Math.floor(hours / 10)]; 
+            document.getElementById("h_2").src = img[hours % 10]; 
+            document.getElementById("m_1").src = img[Math.floor(minutes / 10)]; 
+            document.getElementById("m_2").src = img[minutes % 10]; 
+            document.getElementById("s_1").src = img[Math.floor(seconds / 10)]; 
+            document.getElementById("s_2").src = img[seconds % 10]; 
+
+            setTimeout(updateTime, 1000);
+        }
+        function updateSplash(){
+            splash = !splash;
+            document.getElementById("sep_1").src = splash ? "img/points.gif" : "img/blank.gif";
+            document.getElementById("sep_2").src = splash ? "img/points.gif" : "img/blank.gif";
+            setTimeout(updateSplash, 895);
+        }
+        updateTime();
+        updateSplash();
+    </script>
+</body>
+</html>
