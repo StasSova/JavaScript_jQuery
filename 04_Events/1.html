@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .bold {
+            font-weight: 700;
+        }
+        .def {
+            font-weight: 500;
+        }
+        .bold ul{
+            font-weight: normal;
+        }
+        .collapsed {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <ul id="myList">
+        <li> This PC
+            <ul>
+                <li> Local Disk (C:)
+                    <ul>
+                        <li>Program Files</li>
+                        <li>Users</li>
+                        <li>Windows</li>
+                    </ul>
+                </li>
+                <li> Local Disk (D:)
+                    <ul>
+                        <li>New Folder 1</li>
+                        <li>New Folder 2</li>
+                        <li>New Folder 3</li>
+                    </ul>
+                </li>
+                <li> Local Disk (E:)</li>
+            </ul>
+        </li>
+    </ul>
+    
+    <script>
+        // Получаем все элементы <li>
+        var listItems = document.querySelectorAll('li');
+
+        // Добавляем обработчик события для каждого элемента
+        listItems.forEach(function(item) {
+            // Добавляем класс стиля при наведении на элемент
+            item.addEventListener('mouseover', function(e) {
+                e.stopPropagation()
+                e.currentTarget.classList.add('bold');
+            });
+
+            // Удаляем класс стиля при уходе с элемента
+            item.addEventListener('mouseleave', function(e) {
+                e.currentTarget.classList.remove('bold');
+                e.stopPropagation()
+            });
+
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var nestedList = e.currentTarget.querySelector('ul');
+                if (nestedList) {
+                    nestedList.classList.toggle('collapsed');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #text{
+            border: 1px solid black;
+            text-align: justify;
+            overflow-wrap: break-word;
+            padding: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+        #slider{
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            width: 20px;
+            height: 20px;
+            background-color: gray;
+            transform: rotate(45deg);
+        }
+        #slider:hover{
+            cursor:nwse-resize;
+        }
+    </style>
+</head>
+<body>
+    <div id="text">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Magnam inventore suscipit eos ullam beatae, voluptatem consequuntur error velit nemo, atque dignissimos reprehenderit, ipsam aliquam iure architecto cupiditate impedit optio? Tempora!
+    Aperiam, fuga neque reiciendis reprehenderit illo, nam non nisi saepe dolorum magnam enim perspiciatis, doloribus modi amet iusto accusantium ipsam similique sunt vel. Hic fugit magnam ea eos vel dolorem.
+        <div id="slider"></div>
+    </div>
+    
+    <script>
+        let el = document.getElementById("text");
+        let slider = document.getElementById("slider");
+        let xPos, yPos;
+        let leftDown = false;
+        let paddingX = parseInt(window.getComputedStyle(el).paddingLeft) + parseInt(window.getComputedStyle(el).paddingRight);
+        let paddingY = parseInt(window.getComputedStyle(el).paddingTop) + parseInt(window.getComputedStyle(el).paddingBottom);
+
+        document.addEventListener('mousemove', function(e){
+            if (leftDown) {
+                let newWidth = e.clientX - el.offsetLeft - paddingX + 'px';
+                let newHeight = e.clientY - el.offsetTop - paddingY + 'px';
+                el.style.width = newWidth;
+                el.style.height = newHeight;
+            }
+        });
+        slider.addEventListener('mousedown',function(e){
+            leftDown = true;
+        });
+        document.addEventListener('mouseup',function(e){
+            leftDown = false;
+        });
+
+    </script>
+</body>
+</html>

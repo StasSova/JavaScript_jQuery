@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .selected{
+            background-color: orange;
+        }
+    </style>
+</head>
+<body>
+    <div class="list">
+        <p>1. Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+        <p>2. Itaque dignissimos necessitatibus praesentium laudantium quae sed nam eos, quidem cupiditate ducimus est at officiis placeat! Illum quas pariatur nam fugit eveniet.</p>
+        <p>3. Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+        <p>4. Itaque dignissimos necessitatibus praesentium laudantium quae sed nam eos, quidem cupiditate ducimus est at officiis placeat! Illum quas pariatur nam fugit eveniet.</p>
+        <p>5. Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+        <p>6. Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+        <p>7. Itaque dignissimos necessitatibus praesentium laudantium quae sed nam eos, quidem cupiditate ducimus est at officiis placeat! Illum quas pariatur nam fugit eveniet.</p>
+    </div>
+    <script>
+        let selectedItems = [];
+        let ctrlActive = false;
+        let lastClickedIndex = null;
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Control') {
+                ctrlActive = true;
+            }
+        });
+        
+        document.addEventListener('keyup', function(event) {
+            if (event.key === 'Control') {
+                ctrlActive = false;
+            }
+        });
+
+        var listItems = document.querySelectorAll('.list p');
+        listItems.forEach(function(item, index) {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (ctrlActive) {
+                    this.classList.toggle('selected');
+                    if (selectedItems.includes(this)) {
+                        selectedItems.splice(selectedItems.indexOf(this), 1);
+                    } else {
+                        selectedItems.push(this);
+                    }
+                } else {
+                    if (lastClickedIndex !== null && e.shiftKey) {
+                        let start = Math.min(index, lastClickedIndex);
+                        let end = Math.max(index, lastClickedIndex);
+                        selectedItems.forEach(function(selectedItem) {
+                            selectedItem.classList.remove('selected');
+                        });
+                        selectedItems = [];
+                        for (let i = start; i <= end; i++) {
+                            listItems[i].classList.add('selected');
+                            selectedItems.push(listItems[i]);
+                        }
+                    } else {
+                        selectedItems.forEach(function(selectedItem) {
+                            selectedItem.classList.remove('selected');
+                        });
+                        selectedItems = [];
+                        this.classList.add('selected');
+                        selectedItems.push(this);
+                    }
+                }
+                lastClickedIndex = index;
+            });
+        });
+    </script>
+</body>
+</html>
