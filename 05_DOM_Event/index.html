@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nested List Builder</title>
+</head>
+<body>
+    <div class="main">
+        <input type="text" id="inputText" placeholder="Text input">
+        <br/>
+
+        <input name="1" type="radio" id="addEnd"/> 
+        <label for="addEnd"> Add new item at the end of list</label>
+        <br/>
+        <input name="1" type="radio" id="addPos"/> 
+        <label for="addPos"> Insert new item at specified position</label>
+        <br/>
+        <input name="1" type="radio" id="changeText"/> 
+        <label for="changeText">Change item text</label>
+        <br/>
+        <input name="1" type="radio" id="addList"/> 
+        <label for="addList">Add nested list</label>
+        <br/>
+        <input name="1" type="radio" id="remEl"/> 
+        <label for="remEl">Remove item</label>
+        <br/>
+        <button id="btn_AddList">Add new List</button>
+    </div>
+
+    <div class="container" id="container">
+        
+    </div>
+
+    <script>
+        let container = document.getElementById("container");
+        let inputText = document.getElementById("inputText");
+        let btnAddList = document.getElementById("btn_AddList");
+        let currentList = null;
+        let _func;
+
+        function EventHandler(event){
+            switch (_func.name){
+                case ("changeItemText"): { changeItemText(event); break;}
+                case ("addItemToEnd"): { addItemToEnd(event); break;}
+                case ("insertItemAtPosition"): { addItemToEnd(event, false); break;}
+                case ("addNestedList"): { addNestedList(event); break;}
+                case ("removeItem"): { removeItem(event); break;}
+            }
+        }
+
+
+        // по кнопке Add new List
+        function btn_addNewList(event) {
+            if (currentList === null){
+                let ul = document.createElement("ul");
+                container.appendChild(ul);
+                currentList = ul;
+            }
+            let text = inputText.value || "Simple text";
+            let li = createLIItem(text);
+            currentList.appendChild(li);
+        }
+        
+        function addItemToEnd(event, toEnd = true) {
+            let target = event.target;
+            if (target.tagName !== "LI") {return;}
+            let li = createLIItem(inputText.value || "New text");
+            if (toEnd == true) target.parentElement.appendChild(li)
+            else target.parentElement.insertBefore(li, target || target.nextElementSibling);
+            event.stopPropagation();
+        }
+        // change item text
+        function changeItemText(event) {
+            let target = event.target;
+            if (target.tagName === "LI") {
+                let newText = inputText.value || "New text";
+                // Проверяем, есть ли у LI дочерний TextNode
+                if (target.firstChild && target.firstChild.nodeType === Node.TEXT_NODE) {
+                    // Если да, то изменяем его содержимое
+                    target.firstChild.nodeValue = newText;
+                } else {
+                    // Если нет, создаем новый TextNode и добавляем его к LI
+                    let textNode = document.createTextNode(newText);
+                    target.appendChild(textNode);
+                }
+            }
+        }
+
+        function addNestedList(event) {
+            let text = inputText.value || "Nested list";
+            let li = event.target.closest("li"); // Получаем ближайший родительский элемент li
+            if (!li) return;
+            if (li.querySelector("ul")) {
+                return;
+            }
+            let ul = document.createElement("ul");
+            let nestedLi = createLIItem(text);
+            ul.appendChild(nestedLi);
+            li.appendChild(ul);
+            event.stopPropagation();
+        }
+        
+        function createLIItem(text) {
+            let li = document.createElement("li");
+            li.textContent = text;
+            li.addEventListener("click", EventHandler);
+            return li;
+        }
+
+        function removeItem(event) {
+            let target = event.target;
+            if (target.tagName === "LI") {
+                target.parentElement.removeChild(target);
+            }
+        }
+
+
+
+        
+        function addNewList(event) {
+            let ul = document.createElement("ul");
+            let text = inputText.value || "Simple text";
+            let li = createListItem(text);
+            ul.appendChild(li);
+            container.appendChild(ul);
+            currentList = ul;
+        }
+
+
+        
+        
+        
+        
+        
+        // не исп
+        function insertItemAtPosition(event, textNode) {
+            if (!currentList) return;
+            let text = inputText.value || "New item";
+            let position = prompt("Enter position to insert (starting from 1):");
+            if (position === null) return;
+            position = parseInt(position);
+            if (isNaN(position) || position < 1 || position > currentList.children.length + 1) {
+                alert("Invalid position!");
+                return;
+            }
+            let li = createListItem(text);
+            currentList.insertBefore(li, currentList.children[position - 1]);
+        }
+
+        btnAddList.addEventListener("click", btn_addNewList);
+        document.getElementById("addEnd").addEventListener("click", () => {_func = addItemToEnd});
+        document.getElementById("addPos").addEventListener("click", () => {_func = insertItemAtPosition});
+        document.getElementById("changeText").addEventListener("click", () => {_func = changeItemText});
+        document.getElementById("addList").addEventListener("click", () => {_func = addNestedList});
+        document.getElementById("remEl").addEventListener("click", () => {_func = removeItem});
+    </script>
+</body>
+</html>
