@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        width: 100%;
+    }
+    .task1{
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Выравнивание текста по горизонтали */
+        align-items: center; /* Выравнивание текста по вертикали */
+        background-color: burlywood;
+        height: max-content; /* Пример значения высоты */
+        margin: 5% 0;
+    }
+    .simpleText {
+        font-size: 24px;
+        color: gray;
+    }
+    .inputText{
+        width: 50%;
+        height: 24px;
+        font-size: 16px;
+    }
+
+
+    .accordion {
+        background-color: #f4f4f4;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        width: 50%;
+    }
+
+    .accordion .header {
+        background-color: #ddd;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .accordion .content {
+        display: none;
+        padding: 10px;
+    }
+
+    .accordion.active .content {
+        display: block;
+    }
+
+    .textarea{
+        width: 50%;
+        min-height: 80px;
+        height: auto;
+    }
+    .hidden{
+        display: none;
+    }
+
+
+
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+<body>
+</body>
+
+<script>
+    // task 1
+    let task1 = document.createElement("div");
+    task1.id = "task1";
+    task1.classList.add("task1");
+
+    let text = "Enter your name (name can`t contain digits):"
+    let txtNode = document.createElement("p");
+    txtNode.classList.add("simpleText"); // Добавляем класс "simpleText" к элементу
+    txtNode.textContent = text; // Устанавливаем текстовое содержимое элемента
+    task1.appendChild(txtNode); // Добавляем элемент txtNode к элементу task1
+
+    let inputText = document.createElement("input");
+    inputText.type = "text";
+    inputText.classList.add("inputText");
+    inputText.addEventListener("keypress", (e) => {
+        if(e.key>=0&&e.key<=9&&e.key !== " "){e.preventDefault();}
+    });
+    task1.appendChild(inputText);
+    document.body.appendChild(task1); // Добавляем элемент task1 к телу документа
+
+
+    // task 2
+    let task2 = document.createElement("div");
+    task2.id = "task2";
+    task2.classList.add("task1");
+
+    const accordionData = [
+        { header: 'Section 1', content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Est, sit quibusdam. At cupiditate earum possimus expedita a ipsam ut! Neque iusto sed dolores modi non quibusdam. At repellendus aliquam voluptas.' },
+        { header: 'Section 2', content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Est, sit quibusdam. At cupiditate earum possimus expedita a ipsam ut! Neque iusto sed dolores modi non quibusdam. At repellendus aliquam voluptas.' },
+        { header: 'Section 3', content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Est, sit quibusdam. At cupiditate earum possimus expedita a ipsam ut! Neque iusto sed dolores modi non quibusdam. At repellendus aliquam voluptas.' },
+        { header: 'Section 4', content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Est, sit quibusdam. At cupiditate earum possimus expedita a ipsam ut! Neque iusto sed dolores modi non quibusdam. At repellendus aliquam voluptas.' },
+    ];
+    let openAccordion;
+    accordionData.forEach(data => {
+        const accordion = document.createElement('div');
+        accordion.classList.add('accordion');
+
+        const header = document.createElement('div');
+        header.classList.add('header');
+        header.textContent = data.header;
+
+        const content = document.createElement('div');
+        content.classList.add('content');
+        content.textContent = data.content;
+
+        accordion.appendChild(header);
+        accordion.appendChild(content);
+
+        task2.appendChild(accordion);
+
+        header.addEventListener('click', (e) => 
+        {
+            if (openAccordion && openAccordion !== accordion) {
+            openAccordion.classList.remove('active');
+            }
+            accordion.classList.toggle('active');
+            openAccordion = accordion.classList.contains('active') ? accordion : null;
+        });
+    });
+
+    document.body.appendChild(task2);
+
+
+
+
+    // task 3
+    let task3 = document.createElement("div");
+    let currentText = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Est, sit quibusdam. At cupiditate earum possimus expedita a ipsam ut! Neque iusto sed dolores modi non quibusdam. At repellendus aliquam voluptas.";
+
+    let instructions = document.createElement("p");
+    instructions.classList.add("simpleText");
+    instructions.textContent = "Press Ctrl + E to edit text, and Ctrl + S to save";
+    task3.appendChild(instructions);
+
+    let textDiv = document.createElement("div");
+    textDiv.classList.add("simpleText");
+    textDiv.textContent = currentText;
+    task3.appendChild(textDiv);
+
+    let textArea = document.createElement("textarea");
+    textArea.classList.add("textarea", "hidden");
+    textArea.value = currentText;
+    task3.appendChild(textArea);
+
+    document.addEventListener("keydown", function(event) {
+        if (event.ctrlKey && event.key === "e") {
+            event.preventDefault(); 
+            event.stopPropagation();
+            textArea.classList.remove("hidden");
+            textDiv.classList.add("hidden");
+            textArea.focus();
+        } else if (event.ctrlKey && event.key === "s") {
+            event.preventDefault(); 
+            event.stopPropagation();
+            currentText = textArea.value;
+            textDiv.textContent = currentText;
+            textDiv.classList.remove("hidden");
+            textArea.classList.add("hidden");
+        }
+    });
+    document.body.appendChild(task3);
+
+
+    // task 4
+    const headers = ["FirstName", "LastName", "Age", "Company"];
+    const peoples = [
+        {FirstName: "Mark", LastName: "Zuckerber", Age:"34", Company:"Facebook"},
+        {FirstName: "Larry", LastName: "Page", Age:"45", Company:"Google"},
+        {FirstName: "Timothy", LastName: "Cook", Age:"57", Company:"Apple"},
+        {FirstName: "Bill", LastName: "Gates", Age:"62", Company:"Microsoft"},
+    ];
+
+    let task4 = document.createElement("div");
+    task4.classList.add("task1");
+
+    // Создаем таблицу
+    let table = document.createElement("table");
+
+    // Создаем заголовок таблицы
+    let headerRow = document.createElement("tr");
+    headers.forEach(headerText => {
+        let headerCell = document.createElement("th");
+        headerCell.textContent = headerText;
+        headerCell.addEventListener("click", headerCellClickHandler);
+        headerRow.appendChild(headerCell);
+    });
+    table.appendChild(headerRow);
+
+    // Заполняем таблицу данными
+    peoples.forEach(person => {
+        let row = document.createElement("tr");
+
+        headers.forEach(header => {
+            let cell = document.createElement("td");
+            cell.textContent = person[header];
+            row.appendChild(cell);
+        });
+
+        table.appendChild(row);
+    });
+
+    let sortDirection;
+
+    function headerCellClickHandler(event) {
+        let headerText = event.target.textContent;
+
+        if (sortDirection === undefined || sortDirection !== headerText) {
+            // Сортировка по возрастанию
+            peoples.sort((a, b) => {
+                if (a[headerText] < b[headerText]) return -1;
+                if (a[headerText] > b[headerText]) return 1;
+                return 0;
+            });
+            sortDirection = headerText;
+        } else {
+            // Сортировка по убыванию
+            peoples.sort((a, b) => {
+                if (a[headerText] < b[headerText]) return 1;
+                if (a[headerText] > b[headerText]) return -1;
+                return 0;
+            });
+            sortDirection = undefined; // Сброс направления сортировки
+        }
+        
+        
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+        
+        peoples.forEach(person => {
+            let row = document.createElement("tr");
+            headers.forEach(header => {
+                let cell = document.createElement("td");
+                cell.textContent = person[header];
+                row.appendChild(cell);
+            });
+            table.appendChild(row);
+        });
+    }
+
+    task4.appendChild(table);
+    document.body.appendChild(task4);
+</script>
+
+</html>
