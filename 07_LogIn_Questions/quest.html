@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .questionContainer {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .answContainer {
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 24px auto;
+            gap: 8px 12px;
+        }
+
+        .questionText {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .answCheckBox,
+        .answRadio {
+            margin-right: 5px;
+        }
+
+        .answLabel {
+            margin-right: 15px;
+            text-wrap: wrap;
+        }
+
+        .timer{
+            font-size: 24px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <p id="TitleText"></p>
+    <div class="container" id="mainContainer">
+
+    </div>
+    <p id="timer" class="timer"></p>
+    <input type="button" value="Ответить" id="btnNextQuest">
+</body>
+<script>
+   const questions = [
+    {
+        question: "Что выведется на экран при выполнении следующего кода: console.log(1 + '2' + '2')?",
+        options: ["122", "5", "124"],
+        correctAnswers: ["1d585ffbdca53d229f3fa11724e8c231b8410f00742f5f407c2c033c1148ca63"]
+    },
+    {
+        question: "В чем разница между методами event.preventDefault() и event.stopPropagation()?",
+        options: [
+            "preventDefault() останавливает всплытие события, в то время как stopPropagation() предотвращает стандартное действие элемента.",
+            "preventDefault() предотвращает стандартное действие элемента, в то время как stopPropagation() останавливает всплытие события.",
+            "Эти методы выполняют одно и то же действие.",
+            "preventDefault() и stopPropagation() используются для предотвращения повторного вызова обработчика события."
+        ],
+        correctAnswers: ["cd2ba7f986ba358c35d569934b1e61478fda4262f6a20e25325a09e70c81a5b5"]
+    },
+    {
+        question: "Какой будет результат выражения: 1 + 2 + '3'?",
+        options: ["33", "6", "123"],
+        correctAnswers: ["ddc6b6f45644df5b010ea142b5490c322e1b41e4bf508842255635ce79e7fb5c"]  
+    },
+    {
+        question: "Что будет результатом выражения: 'true' == true?",
+        options: ["true", "false"],
+        correctAnswers: ["e3fcc3466543e2188a38f4f4867ee64e45230d529ccc7dbc3a61dd434955247d"]  
+    },
+    {
+        question: "Что выведет console.log(typeof typeof 1)?",
+        options: ["'number'", "'string'", "'object'"],
+        correctAnswers: ["924dc9a164532654cdfc14538d0460334366c7b41383d7c3f73e9957533c4f09"]  
+    },
+    {
+        question: "Что вернет функция parseInt('3.14')?",
+        options: ["3", "3.14", "NaN"],
+        correctAnswers: ["2b51daa5c1d79aed74e685e0cac62185678b6be59c16b5c87996ac064d403635"]  
+    },
+    {
+        question: "Какое из перечисленных ниже не является ключевым словом в JavaScript?",
+        options: ["function", "class", "let"],
+        correctAnswers: ["8aa200aee8361d37b0fe0b9a75ed8e814884bb2e67ac68b456f1ba244b346737"]  
+    },
+    {
+        question: "Что выведет console.log('Hello' + 2)?",
+        options: ["'Hello2'", "'Hello'", "'2'"],
+        correctAnswers: ["8e199f6afab1b878f694604682d0926e43a74b80b523e9ab7f975b7fa0df997b"]  
+    },
+    {
+        question: "Что такое замыкание в JavaScript?",
+        options: [
+            "Это функция, которая имеет доступ к области видимости родительской функции, даже после того, как родительская функция завершила работу.",
+            "Это процесс, при котором JavaScript-код транслируется в машинный код.",
+            "Это метод, используемый для изменения значения переменной в JavaScript."
+        ],
+        correctAnswers: ["24ec6f7b1089e2af55f59d3a3e11487c9d300acc9598a8b845a6302fa0669e7f"]  
+    },
+    {
+        question: "Что такое DOM в контексте веб-разработки?",
+        options: [
+            "Это аббревиатура от Digital Object Model и представляет собой модель объекта для цифровых документов.",
+            "Это аббревиатура от Document Object Model и представляет собой стандартный способ доступа и изменения HTML и XML-документов.",
+            "Это аббревиатура от Document Object Model и представляет собой способ аутентификации пользователей на веб-сайтах."
+        ],
+        correctAnswers: ["284cc53ad1dc81baa1ae4aa57a0f78d9f99c666835d8185aea977224170848bc"]  
+    },
+    {
+        question: "Какие из перечисленных ниже языков программирования являются родственными JavaScript?",
+        options: [
+            "Java",
+            "C#",
+            "TypeScript"
+        ],
+        correctAnswers: ["07655a89640eae5fb78197abbc1db8c361e614fc67a5156784ec23f82444e187"]  
+    },
+    {
+        question: "Какие типы данных существуют в JavaScript?",
+        options: [
+            "Number",
+            "String",
+            "Boolean",
+            "Object",
+            "Array"
+        ],
+        correctAnswers: ["68719c5b115c476bea767bcde842cab0ebd465e0a279fd785556c17df3fdb8c9", "1eb5f2632ed54762452872246396e3dfbf69ae1d8776586cddee139d113dae92", "72090fdde4cdfe35a3ed74dd333f416b7d935a92d8ce5a022de518b3fff1fa51", "97c9e9125c501cb221e9fd3fb7c8f944252c262db1a8f074f118fd32dc42aae0", "082c95073bda53f79ec823af8be31e8b5e975a179e1431ef55d35247d55cf6d5"]
+    },
+    {
+        question: "Какой метод используется для определения типа данных переменной в JavaScript?",
+        options: [
+            "typeof",
+            "getType()",
+            "type()",
+            "typeofData()"
+        ],
+        correctAnswers: ["37e78085984a855714c993f0b0dbbd21c42d8360df43a534c5535cd2b2e85023"]
+    },
+    {
+        question: "Какой тип данных будет у переменной, содержащей число с плавающей запятой?",
+        options: [
+            "Number",
+            "Float",
+            "Integer",
+            "Double"
+        ],
+        correctAnswers: ["68719c5b115c476bea767bcde842cab0ebd465e0a279fd785556c17df3fdb8c9"]
+    },
+    {
+        question: "Какой из перечисленных типов является примитивным в JavaScript?",
+        options: [
+            "Object",
+            "Array",
+            "Function",
+            "Undefined"
+        ],
+        correctAnswers: ["436c7c2afd39608ff408960c0287d33d07cf0187cb871a848730f3c54740118e"]
+    },
+    {
+        question: "Какой результат выведет console.log(typeof null)?",
+        options: [
+            "\"null\"",
+            "\"undefined\"",
+            "\"object\"",
+            "\"number\""
+        ],
+        correctAnswers: ["9503e4f20778f862ff26843d90dea383774c5e6cd01bc8f9150e903400e997ee"]
+    },
+    {
+        question: "Какие типы событий поддерживаются в JavaScript?",
+        options: [
+            "События мыши",
+            "События клавиатуры",
+            "События загрузки",
+            "События формы"
+        ],
+        correctAnswers: ["ad825de33006b17409be6207952249ab2ecafc6de6525c973dba114610754e54", "6adbbc495efd256232e422cb11b65f3ee172fbf64ce911134a57b93d75fd5fa5", "0657f1dabc423fc1ac5460db47dd24145a8f5875bb185b0fd2611b666281ced6", "62cb51aa75f4214880c2d95bd426c832eca5588a23ff89c3c8d08f4dde1f770d"]
+    },
+    {
+        question: "Какой тип данных будет у переменной, содержащей строку?",
+        options: [
+            "String",
+            "Text",
+            "Char",
+            "Line"
+        ],
+        correctAnswers: ["1eb5f2632ed54762452872246396e3dfbf69ae1d8776586cddee139d113dae92"]
+    },
+    {
+        question: "Что будет результатом выражения typeof undefined?",
+        options: [
+            "\"undefined\"",
+            "\"null\"",
+            "\"object\"",
+            "\"number\""
+        ],
+        correctAnswers: ["db7e2fc256aeff8728dbcd892789e3601836c75344b0015df06b8c950239cff2"]
+    },
+    {
+        question: "Какой тип данных будет у переменной, содержащей логическое значение?",
+        options: [
+            "Boolean",
+            "Logic",
+            "Binary",
+            "Bool"
+        ],
+        correctAnswers: ["72090fdde4cdfe35a3ed74dd333f416b7d935a92d8ce5a022de518b3fff1fa51"]
+    },
+    {
+        question: "Что такое NaN в JavaScript?",
+        options: [
+            "Not a Name",
+            "Not a Node",
+            "Not a Null",
+            "Not a Number"
+        ],
+        correctAnswers: ["389aa26c74690084fa45a5edf86e2d82c77997fbab5280d5dab8c36f13a33214"]
+    },
+    {
+        question: "Какой тип данных будет у переменной, содержащей массив?",
+        options: [
+            "Array",
+            "List",
+            "Collection",
+            "Set"
+        ],
+        correctAnswers: ["082c95073bda53f79ec823af8be31e8b5e975a179e1431ef55d35247d55cf6d5"]
+    },
+    {
+        question: "Какие циклы поддерживаются в JavaScript?",
+        options: [
+            "for",
+            "while",
+            "do...while",
+            "foreach"
+        ],
+        correctAnswers: ["94af43e81922e3259552cca171f3e93dc753c81fd9ca592b5ab124f1d1f4a8b9", "1db6fb268c7fc5dd2b4f2d37216223494e59188804b30b3ec6f652981a7c8bf0", "3611535485e19551bd93b1a56d88d1e2d2ae5b42fd6ddd520417b7eaaf3c0a81"]
+    }, 
+    {
+        question: "Как проверить, является ли значение массивом?",
+        options: [
+            "С помощью метода Array.isArray(value)",
+            "С помощью условного выражения if(value.isArray)",
+            "С помощью typeof value === 'array'",
+            "С помощью value instanceof Array"
+        ],
+        correctAnswers: ["cd8e572449dc9c0f63d01d292c7a801fcc0d0f5ef35226cbe0a25a6a031e813c"]
+    },
+    {
+        question: "Как проверить, является ли значение ложным?",
+        options: [
+            "С помощью условного выражения if(value)",
+            "С помощью метода value.isFalsy()",
+            "С помощью стрелочной функции (value) => !value",
+            "С помощью условного выражения if(!value)"
+        ],
+        correctAnswers: ["b835bc9ab82cfb5128f67d0e646b168228d0379aec3fde27c04d023fc7814996"]
+    },
+    {
+        question: "Какое значение имеет this?",
+        options: [
+            "this всегда ссылается на глобальный объект Window.",
+            "this ссылается на текущий контекст выполнения, который зависит от того, как вызывается функция.",
+            "this является зарезервированным словом, которое нельзя использовать в JavaScript.",
+            "this всегда ссылается на объект, в котором была вызвана функция."
+        ],
+        correctAnswers: ["c911ed61cc17ddd1ddf2ba01e1f3bee8f75528e1d15dc89b30077259191d4b23"]
+    },
+    {
+        question: "Какие значения в JS являются ложными?",
+        options: [
+            "true, 1, 'true', {}, []",
+            "false, 0, '', null, undefined, NaN",
+            "true, 1, 'true'",
+            "false, 0, '', null, undefined"
+        ],
+        correctAnswers: ["67544f69d4d37fe1546c09166cea605224198272f40c8ebab5ce4a7ab433bc8e"]
+    },
+    {
+        question: "Для чего используется оператор '||'?",
+        options: [
+            "Для выполнения кода, если оба условия истинны.",
+            "Для выполнения кода, если хотя бы одно из условий истинно.",
+            "Для объединения условий в логическое ИЛИ и выполнения кода, если хотя бы одно из условий истинно.",
+            "Для проверки на равенство двух значений."
+        ],
+        correctAnswers: ["dcd8edb2784985ae3c82c88a7fe43d15aa7874c4961741cce904fc61297a97c9"]
+    },
+    {
+        question: "Для чего используется оператор '&&'?",
+        options: [
+            "Для выполнения кода, если хотя бы одно из условий истинно.",
+            "Для проверки на равенство двух значений.",
+            "Для выполнения кода, если оба условия истинны.",
+            "Для объединения условий в логическое И и выполнения кода, если оба условия истинны."
+        ],
+        correctAnswers: ["cc3634c45c7d719dd21b55b8db701b182f4b1d490b3119712ffaee2d2d2f0bcb"]
+    },
+    {
+        question: "В чем разница между null и undefined?",
+        options: [
+            "Оба обозначают отсутствие значения.",
+            "null - это значение, которое было присвоено, в то время как undefined обозначает отсутствие присвоения значения.",
+            "Оба обозначают одно и то же.",
+            "undefined - это значение, которое было присвоено, в то время как null обозначает отсутствие присвоения значения."
+        ],
+        correctAnswers: ["d7f877d5a015bca434793d6fe30b1976099876788933e4db88484d742da32530"]
+    }
+];
+
+    function sha256(str) {
+        return new Promise((resolve, reject) => {
+            // Преобразуем строку в массив байт
+            const buffer = new TextEncoder("utf-8").encode(str);
+            // Хеш SHA-256
+            crypto.subtle.digest("SHA-256", buffer).then(hash => {
+                // Преобразуем хеш в строку шестнадцатеричных символов
+                let result = '';
+                const view = new DataView(hash);
+                for (let i = 0; i < hash.byteLength; i += 4) {
+                    result += ('00000000' + view.getUint32(i).toString(16)).slice(-8);
+                }
+                resolve(result);
+            }).catch(error => {
+                reject(error);
+            });
+        });
+    }
+
+    async function createHashes() {
+        for (const question of questions) {
+            for (const correctIndex of question.correctAnswers) {
+                const correctAnswer = question.options[correctIndex];
+                try {
+                    const hash = await sha256(correctAnswer + "-" + correctAnswer);
+                    console.log(hash +" --- "+ correctAnswer);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        }
+    }
+
+    createHashes();
+
+
+    const timeToRound = 30;
+    let timeToEnd = timeToRound;
+    let timer = document.getElementById("timer");
+    let questionIndex = 0;
+    let Score = 0;
+
+    const but = document.getElementById("btnNextQuest");
+    but.addEventListener("click", onNextQuestionClick);
+
+    const title = document.getElementById("TitleText");
+    title.textContent = `Вопрос: ${questionIndex}\\${questions.length-1}`;
+
+    let main = document.getElementById("mainContainer");
+    const questionElement = createQuestionElement(questions[questionIndex]);
+    main.appendChild(questionElement);
+    
+    function createQuestionElement(question){
+        // Создаем элемент для текста вопроса
+        const questionElement = document.createElement("div");
+        questionElement.classList.add("questionContainer");
+
+        // Добавляем текст вопроса
+        const questionText = document.createElement("p");
+        questionText.textContent = question.question;
+        questionText.classList.add("questionText");
+        questionElement.appendChild(questionText);
+
+        const answContainer = document.createElement("div");
+        answContainer.classList.add("answContainer");
+        // Проверяем, сколько правильных ответов
+        const numCorrectAnswers = question.correctAnswers.length;
+        // Если правильных ответов больше одного, используем checkbox
+        if (numCorrectAnswers > 1) {
+            question.options.forEach((option, index) => {
+                const checkbox = document.createElement("input");
+                checkbox.classList.add("answCheckBox");
+                checkbox.type = "checkbox";
+                checkbox.value = option;
+
+                checkbox.id = option.replace(/\s+/g, "-");
+
+                const label = document.createElement("label");
+                label.classList.add("answLabel");
+                label.textContent = option;
+                label.setAttribute("for", option.replace(/\s+/g, "-"));
+
+                answContainer.appendChild(checkbox);
+                answContainer.appendChild(label);
+            });
+        } else {
+            // Иначе используем radio
+            question.options.forEach((option, index)=> {
+                const radio = document.createElement("input");
+                
+                radio.type = "radio";
+                radio.classList.add("answRadio");
+                radio.value = option;
+                radio.name = "question-" + question.id;
+                radio.id = option.replace(/\s+/g, "-");
+                
+                const label = document.createElement("label");
+                label.textContent = option;
+                label.classList.add("answLabel");
+                label.setAttribute("for", option.replace(/\s+/g, "-"));
+                
+                answContainer.appendChild(radio);
+                answContainer.appendChild(label);
+            });
+        }
+        questionElement.appendChild(answContainer);
+        return questionElement;
+    }
+
+    // Функция, которая будет вызываться каждую секунду
+    function countdown() {
+        // Обновляем текстовое содержимое таймера
+        timer.textContent = `Осталось времени: ${timeToEnd} с.`;
+
+        // Уменьшаем время до окончания на одну секунду
+        timeToEnd--;
+
+        // Если время закончилось, очищаем интервал и выполняем необходимые действия
+        if (timeToEnd < 0) {
+            onNextQuestionClick();
+        }
+    }
+    // Запускаем таймер с интервалом 1 секунда (1000 миллисекунд)
+    let intervalId = setInterval(countdown, 1000);
+        
+    async function checkAnswers(question) {
+        // Создаем переменную для подсчета правильных ответов
+        let correctAnswersCount = 0;
+
+        // Переменная для хранения количества выбранных ответов
+        let selectedAnswersCount = 0;
+
+        const answContainer = document.querySelector('.answContainer');
+        const answ = answContainer.querySelectorAll('input:checked');
+        for (let i = 0; i < answ.length; i++) {
+            const answer = answ[i];
+            selectedAnswersCount++;
+            // Проверяем, является ли выбранный ответ правильным
+            if (question.correctAnswers.includes(await sha256(answer.value + "-" + answer.value))) {
+                correctAnswersCount++;
+            } else {
+                // если есть один не правильный ответ - весь ответ не правильный.
+                correctAnswersCount = 0;
+                break;
+            }
+        }
+
+        // Если пользователь не выбрал ни одного ответа, считаем его ответ неправильным
+        if (selectedAnswersCount === 0 || correctAnswersCount===0) {
+            return 0;
+        }
+
+        // Если количество выбранных правильных ответов совпадает с общим количеством правильных ответов
+        // или если выбран правильный ответ (в случае радиокнопок), то возвращаем 1 балл
+        if (correctAnswersCount === question.correctAnswers.length && correctAnswersCount === selectedAnswersCount) {
+            return 1;
+        }
+
+        // Если количество выбранных правильных ответов меньше общего количества правильных ответов,
+        // то считаем долю правильных ответов от общего количества правильных ответов
+        return correctAnswersCount / question.correctAnswers.length;
+    }
+
+    async function onNextQuestionClick() {
+        // Получаем текущий вопрос
+        const currentQuestion = questions[questionIndex];
+        
+        // Вызываем функцию для проверки ответов
+        const scoreForQuest = await checkAnswers(currentQuestion);
+        
+        // Добавляем баллы
+        Score+= scoreForQuest;
+
+        // Очищаем интервал
+        clearInterval(intervalId);
+
+        // Обнуляем таймер
+        timeToEnd = timeToRound;
+
+        // Удаляем старый вопрос
+        const questionElement = document.querySelector('.questionContainer');
+        questionElement.remove();
+
+        // Увеличиваем индекс для получения следующего вопроса
+        questionIndex+=1;
+
+        // Если достигнут конец списка вопросов, обнуляем индекс
+        if (questionIndex === questions.length) {
+            alert('Вы набрали ' + Score + ' баллов.');
+            title.remove();
+            timer.remove();
+            but.remove();
+            return;
+        }
+
+        // Создаем новый элемент для следующего вопроса
+        const nextQuestionElement = createQuestionElement(questions[questionIndex]);
+        main.appendChild(nextQuestionElement);
+
+        // Запускаем таймер снова
+        intervalId = setInterval(countdown, 1000);
+        title.textContent = `Вопрос: ${questionIndex}\\${questions.length-1}`;
+    }
+</script>
+</html>
