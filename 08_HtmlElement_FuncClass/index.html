@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+</body>
+<script>
+    function HtmlElement(tagName, content = "", isAutoClosed = false) {
+        this.tagName = tagName;
+        this.isAutoClosed = isAutoClosed;
+        this.content = content;
+        this.styles = [];
+        this.addStyle = function(property, value) {
+            this.styles.push({ property, value });
+        };
+        this.removeStyle = function(property) {
+            for (let i = 0; i < this.styles.length; i++) {
+                if (this.styles[i].property === property) {
+                    this.styles.splice(i, 1);
+                    break;
+                }
+            }
+        };
+
+        this.attributes = {};
+        this.addAttribute = function(attribute, value) {
+            if (this.attributes.hasOwnProperty(attribute)) {
+                this.attributes[attribute].push(value);
+            } else {
+                this.attributes[attribute] = [value];
+            }
+        };
+        this.removeAttribute = function(attribute) {
+            delete this.attributes[attribute];
+        };
+
+        this.Nodes = [];
+        this.addNode = function(htmlElement, toEnd = true) {
+            htmlElement instanceof HtmlElement ?
+                toEnd ? this.Nodes.push(htmlElement) : this.Nodes.unshift(htmlElement) :
+                console.log(`The ${htmlElement} was not created using the HtmlElement function`);
+        };
+
+        this.getHtml = function() {
+            let html = `<${this.tagName}`;
+            for (const [key, value] of Object.entries(this.attributes)) {
+                html += ` ${key}="${value.join(' ')}"`;
+            }
+            if (this.styles.length > 0) {
+                const styles = this.styles.map(style => `${style.property}: ${style.value}`).join('; ');
+                html += ` style="${styles}"`;
+            }
+            html += '>';
+            if (!this.isAutoClosed) {
+                html += this.content;
+                if (this.Nodes.length > 0) {
+                    this.Nodes.forEach(node => {
+                        html += node.getHtml();
+                    });
+                } 
+                html += `</${this.tagName}>`;
+            }
+            return html;
+        };
+    }
+
+    let wrapper = new HtmlElement("div");
+    wrapper.addStyle("display", "flex");
+    wrapper.addAttribute("id", "wrapper");
+
+    let d1 = new HtmlElement("div");
+    d1.addStyle("width", "300px");
+    d1.addStyle("margin", "10px");
+
+        let h3 = new HtmlElement("h3", "What is Lorem Ipsum");
+        d1.addNode(h3);
+    
+        let img = new HtmlElement("img");
+        img.addStyle("width", "100%");
+        img.addAttribute("src", "https://images.unsplash.com/photo-1708913156554-a379935b302b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDEzfGJvOGpRS1RhRTBZfHxlbnwwfHx8fHw%3D");
+        img.addAttribute("alt", "Lorem Ipsum");
+        d1.addNode(img);
+
+        let p = new HtmlElement("p", "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Mollitia quisquam veniam, consectetur natus velit sunt aliquid odit dicta adipisci harum quasi officiis. Corporis adipisci laboriosam voluptatum accusantium earum commodi ipsum!");
+        p.addStyle("text-align", "justify");
+
+            let a = new HtmlElement("a", "More....");
+            a.addAttribute("href", "https://unsplash.com/t/wallpapers");
+            a.addAttribute("target", "_blank");
+            p.addNode(a);
+            d1.addNode(p);
+
+
+    wrapper.addNode(d1);
+    wrapper.addNode(d1);
+
+    document.write(wrapper.getHtml());
+
+</script>
+</html>
