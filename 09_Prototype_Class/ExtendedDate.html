@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Checker</title>
+    <style>
+        /* Общие стили для всего сайта */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .input-group input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+
+        .input-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .input-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .options button {
+            padding: 12px 20px;
+            margin-right: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .options button:hover {
+            background-color: #0056b3;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .navigation button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .navigation button:hover {
+            background-color: #0056b3;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Date Checker</h1>
+        <div class="input-group">
+            <input type="text" id="dateInput" placeholder="Введите дату (ГГГГ-ММ-ДД)">
+            <button id="displayDateButton">Показать дату</button>
+        </div>
+        <div class="options">
+            <button id="checkPastOrFutureButton">Проверить будущее</button>
+            <button id="checkLeapYearButton">Проверить високосный год</button>
+        </div>
+        <div class="navigation">
+            <button id="previousDateButton">&#8592; Предыдущая дата</button>
+            <button id="nextDateButton">Следующая дата &#8594;</button>
+        </div>
+        <div id="output"></div>
+    </div>
+</body>
+<script>
+    // Получение элементов из html
+    document.getElementById("displayDateButton").addEventListener("click", displayDate);
+    document.getElementById("checkPastOrFutureButton").addEventListener("click", checkPastOrFuture);
+    document.getElementById("checkLeapYearButton").addEventListener("click", checkLeapYear);
+    document.getElementById("previousDateButton").addEventListener("click", previousDate);
+    document.getElementById("nextDateButton").addEventListener("click", nextDate);
+
+    // Получение элементов из HTML
+    const output = document.getElementById("output");
+    const dateInput = document.getElementById("dateInput");
+
+    class ExtendedDate extends Date {
+        constructor() { super(); }
+        displayDate() {
+            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+            const day = super.getDate();
+            const month = months[super.getMonth()];
+            return `${day} ${month}`;
+        }
+        setDateFromString(dateString) {
+            const [year, month, day] = dateString.split('-').map(Number); // Разделяем строку и преобразуем компоненты в числа
+            this.setFullYear(year, month - 1, day); // Устанавливаем новую дату
+        }
+        isFuture() {
+            const currentDate = new Date();
+            return this > currentDate;
+        }
+
+        isLeapYear() {
+            const year = this.getFullYear();
+            return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+        }
+        getNextDate() {
+            const nextDate = new Date(this);
+            nextDate.setDate(nextDate.getDate() + 1);
+            return nextDate;
+        }
+        getPreviousDate() {
+            const nextDate = new Date(this);
+            nextDate.setDate(nextDate.getDate() - 1);
+            return nextDate;
+        }
+    }
+
+    const extendedDate = new ExtendedDate();
+    function displayDate() 
+    {
+        if (dateInput.value) {
+            extendedDate.setDateFromString(dateInput.value);
+            output.textContent = extendedDate.displayDate();
+        } else {
+            output.textContent = "Пожалуйста, введите дату";
+        }
+    }
+    function checkPastOrFuture() 
+    {
+        output.textContent =extendedDate.isFuture();
+    }
+    function checkLeapYear() 
+    {
+        output.textContent =extendedDate.isLeapYear();
+    }
+    function nextDate() 
+    {
+        output.textContent = extendedDate.getNextDate();
+    }
+    function previousDate() 
+    {
+        output.textContent = extendedDate.getPreviousDate();
+    }
+
+
+</script>
+</html>

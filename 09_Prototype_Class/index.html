@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylized Marker Printer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .container {
+            width: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="color"],
+        button {
+            padding: 8px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="color"]{
+            padding: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #output {
+            margin-top: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            min-height: 100px;
+            max-width: 300px;
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Marker Printer</h1>
+    <div class="container">
+        <div class="input-group">
+            <label for="textColor">Text Color:</label>
+            <input type="color" id="textColor">
+        </div>
+        <div class="input-group">
+            <label for="textInput">Text to Print:</label>
+            <input type="text" id="textInput">
+        </div>
+        <div class="input-group">
+            <button onclick="changeColor()">Change Color</button>
+            <button onclick="printText()">Print Text</button>
+            <button onclick="refillMarker()">Refill marker</button>
+        </div>
+        <div id="markerLevel"></div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function Marker(color){
+            this._color = color;
+            this._fill = 1;
+            
+            this.print = function(str) {
+                if (this._fill === 0){
+                    alert("The marker is empty");
+                    return;
+                }
+                
+                // Подсчитываем количество символов, не являющихся пробельными, и делим на 2
+                const nonWhiteSpaceCount = (str.replace(/\s/g, '').length);
+                const inkNeeded = nonWhiteSpaceCount / 2;
+
+                // Проверяем, достаточно ли чернил для напечатанных символов
+                if (inkNeeded <= this._fill) {
+                    this._fill -= inkNeeded; // Уменьшаем количество чернил в маркере
+                } else {
+                    alert("The marker is empty");
+                    // Обрезаем строку до момента, когда закончатся чернила
+                    let trimmedLength = Math.floor(this._fill * 2);
+                    let ind = 0;
+                    for (let i = 0; trimmedLength !== 0 ; i++, ind++) {
+                        if (str[i] !== " ") {
+                            trimmedLength -= 1;
+                        }
+                    }
+
+                    str = str.slice(0, ind);
+                    this._fill = 0; // Маркер опустошен
+                }
+
+                let p = document.createElement("p");
+                p.textContent = str;
+                p.style.color = this._color;
+                document.getElementById("output").appendChild(p);
+            }
+            
+            this.setColor = function(color){
+                this._color = color;
+            }
+            
+            this.getFillLevel = function(){
+                return this._fill;
+            }
+        }
+
+        function RefillMarker(color){
+            Marker.call(this,color);
+            this.refil = function(){
+                this._fill = 100;
+            }
+        }
+        
+        let marker = new RefillMarker("red");
+
+        function changeColor() {
+            var colorInput = document.getElementById("textColor").value;
+            marker.setColor(colorInput);
+        }
+
+        function printText() {
+            var textInput = document.getElementById("textInput").value;
+            marker.print(textInput);
+            updateMarkerLevel();
+        }
+
+        function updateMarkerLevel() {
+            var markerLevel = document.getElementById("markerLevel");
+            markerLevel.textContent = "Marker Level: " + marker.getFillLevel() + "%";
+        }
+        
+        function refillMarker() {
+            marker.refil();
+            updateMarkerLevel();
+        }
+    </script>
+</body>
+</html>
