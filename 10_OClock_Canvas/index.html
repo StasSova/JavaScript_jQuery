@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .cont{
+            display: flex;
+            justify-content: center;
+            align-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="cont">
+        <canvas id="canvas">The current time</canvas>
+    </div>
+    <script>
+
+        let speed = 1,
+            width = 300,
+            height = 300,
+            boarderWidth = 10,
+            primaryColor = "black",
+            secondaryColor = "red",
+            boarderColor = "green",
+            hourTickColor = "blue",
+            secondTickColor = "green"
+            hourNumTicks = true,
+            secondTicks = true,
+            tickLength = 10,
+            backgroundColor = "gray"
+
+        const canvas = document.getElementById("canvas"); 
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+
+        function Draw() {
+            // Draw boarder
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2,    // Coordinates center and circle`s radius
+                    canvas.width/2,                         // Radius
+                    0, Math.PI * 2);                        // Start and end points
+            ctx.fillStyle = boarderColor;                   // Circle`s color
+            ctx.fill();                                     // Circle`s fill
+            ctx.closePath();
+
+            // Draw background
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2,    
+                    canvas.width/2 - boarderWidth/2,        
+                    0, Math.PI * 2);                        
+            ctx.fillStyle = backgroundColor;                
+            ctx.fill();                                     
+            ctx.closePath();
+
+            const tickMark = {
+                width: 10,
+                height: 2,
+            };
+
+            function drawTickMark(x, y, angle, color) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                ctx.fillStyle = color;
+                ctx.fillRect(-tickMark.width / 2, -tickMark.height / 2, tickMark.width, tickMark.height);
+                ctx.restore();
+            }
+
+            // Draw hour tick marks
+            if (hourNumTicks) {
+                for (let i = 0; i < 12; i++) {
+                    let angle = (i / 12) * (2 * Math.PI);
+                    let x1 = canvas.width / 2 + Math.cos(angle) * (canvas.width / 2 - boarderWidth / 2); // X координата начала засечки
+                    let y1 = canvas.height / 2 + Math.sin(angle) * (canvas.height / 2 - boarderWidth / 2); // Y координата начала засечки
+                    drawTickMark(x1, y1, angle, hourTickColor);
+
+                    if (secondTicks) {
+                        // Draw second tick marks
+                        for (let y = 1; y < 5; y++) {
+                            let secAngle = (i /12 + y / 60) * (2 * Math.PI);
+                            let x2 = canvas.width / 2 + Math.cos(secAngle) * (canvas.width / 2 - boarderWidth / 2); // X координата начала засечки
+                            let y2 = canvas.height / 2 + Math.sin(secAngle) * (canvas.height / 2 - boarderWidth / 2); // Y координата начала засечки
+                            drawTickMark(x2, y2, secAngle, secondTickColor);
+                        }
+                    }
+                }
+            }
+
+            // Draw numbers
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            for (let i = 1; i <= 12; i++) {
+                let angle = ((i - 3) * (Math.PI * 2)) / 12;
+                let x = canvas.width / 2 + Math.cos(angle) * (canvas.width / 2 - 30);
+                let y = canvas.height / 2 + Math.sin(angle) * (canvas.height / 2 - 30);
+                ctx.fillText(i, x, y);
+            }
+
+            // Function to draw clock hand
+            function drawClockHand(angle, length, color, width) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(angle);
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, -length);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = width;
+                ctx.stroke();
+                ctx.closePath();
+                ctx.restore();
+            }
+
+            // Draw clock hands
+            let now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+
+            let hourAngle = ((hours % 12) + minutes / 60) * (2 * Math.PI) / 12;
+            let minuteAngle = (minutes + seconds / 60) * (2 * Math.PI) / 60;
+            let secondAngle = (seconds * (2 * Math.PI)) / 60;
+
+            drawClockHand(hourAngle, 80, "black", 6); // Рисуем часовую стрелку
+            drawClockHand(minuteAngle, 120, "red", 4); // Рисуем минутную стрелку
+            drawClockHand(secondAngle, 140, "blue", 2); // Рисуем секундную стрелку
+        }
+
+        setInterval(Draw, 500);
+    </script>
+</body>
+</html>
