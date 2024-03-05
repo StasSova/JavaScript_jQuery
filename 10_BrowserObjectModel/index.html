@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="title">
+        <img src="IMG/TITLE.JPG" alt="title">
+    </div>
+
+    <h1>Компьютерная графика и web дизайн</h1>
+
+    <div id="gallery"></div>
+
+    <script>
+        let newWindow = null;
+
+        const gallery = [
+            "DESIGN/SMALL/P0.JPG",
+            "DESIGN/SMALL/P1.JPG",
+            "DESIGN/SMALL/P2.JPG",
+            "DESIGN/SMALL/P3.JPG",
+            "DESIGN/SMALL/P4.JPG",
+            "DESIGN/SMALL/P5.JPG",
+            "DESIGN/SMALL/P6.JPG",
+        ];
+        const container = document.getElementById("gallery");
+        gallery.forEach(imgSrc => {
+            let img = document.createElement("img");
+            img.src = imgSrc;
+            img.classList.add("img");
+            container.appendChild(img);
+            img.addEventListener("click", function() {
+                showModal(imgSrc);
+            });
+        });
+
+        function showModal(imgSrc) {
+            if (newWindow && !newWindow.closed) {
+                newWindow.close();
+            }
+
+            let img = new Image();
+            let r = imgSrc.slice(imgSrc.lastIndexOf("/"));
+            img.src = "DESIGN" + r;
+
+            img.onload = function(){
+                let Height = img.naturalHeight;
+                let Width = img.naturalWidth;
+
+                newWindow = window.open("bigimage.html?" + r, "_blank", "width=" + Width + ",height=" + Height + ",scrollbars=no");
+
+                if (!newWindow || newWindow.closed || typeof newWindow.closed=='undefined') {
+                    alert("Не удалось открыть изображение в новом окне. Пожалуйста, разрешите всплывающие окна в вашем браузере.");
+                } else {
+                    newWindow.focus();
+                }
+            }
+
+            img.onerror = function() {
+                alert("Изображение не может быть загружено.");
+            }
+        }
+    </script>
+</body>
+</html>
