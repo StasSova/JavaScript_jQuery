@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Регистрационная форма</title>
+    <style>
+        body {
+            font: 10pt Tahoma;
+        }
+
+        table.form_holder1 {
+            font: 10pt Tahoma;
+            background-color: #ddeeff;
+        }
+
+            table.form_holder1 thead {
+                background-color: #334466;
+                color: white;
+                font-weight: bold;
+            }
+    </style>
+</head>
+<body>
+    <form name="frm1">
+        <table class="form_holder1" cellspacing="1">
+            <thead>
+                <tr>
+                    <td colspan="2" align="center">Регистрация на сервере:</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Логин:</td>
+                    <td><input id="userLogin" size="26" type="text" name="login" /></td>
+                </tr>
+                <tr>
+                    <td>Пароль:</td>
+                    <td><input id="userPassword" size="26" type="password" name="text_password1" /></td>
+                </tr>
+                <tr>
+                    <td>Подтверждение:</td>
+                    <td><input id="userPassword2" size="26" type="password" name="text_password2" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <hr />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Полное имя (ФИО):</td>
+                    <td><input id="userFullName" size="26" type="text" name="fullname" /></td>
+                </tr>
+                <tr valign="top">
+                    <td>Пол:</td>
+                    <td>
+                        <input type="radio" name="radio_gender" value="male" />мужской<br />
+                        <input type="radio" name="radio_gender" value="female" />женский
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <td>
+                        Иностранные<br />
+                        языки:
+                    </td>
+                    <td>
+                        <input type="checkbox" name="check_languages_1" />Английский<br />
+                        <input type="checkbox" name="check_languages_2" />Немецкий<br />
+                        <input type="checkbox" name="check_languages_3" />Французский<br />
+                        <input type="checkbox" name="check_languages_4" />Испанский<br />
+                        <input type="checkbox" name="check_languages_5" />Итальянский<br />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Сфера деятельности:</td>
+                    <td>
+                        <select name="list_work">
+                            <option value="0">обслуживание</option>
+                            <option value="1" selected>образование</option>
+                            <option value="2">медицина</option>
+                            <option value="3">наука</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>e-mail:</td>
+                    <td><input size="26" type="text" name="e_mail" /></td>
+                </tr>
+                <tr valign="top">
+                    <td>
+                        Дополнительная<br />
+                        информация:
+                    </td>
+                    <td>
+                        <textarea name="text_info" cols="20" rows="5"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <input id="subButton" type="button" value="Готово" /> <input type="reset" value="Сброс" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+
+    <script>
+
+        
+
+        const logInput = document.getElementById("userLogin");
+        const pasInput = document.getElementById("userPassword");
+        const pas2Input = document.getElementById("userPassword2");
+        const fullNameInput = document.getElementById("userFullName");
+        const genderInputs = document.getElementsByName("radio_gender");
+        const selectWork = document.getElementsByName("list_work")[0];
+        const email = document.getElementsByName("e_mail")[0];
+        const addInfo = document.getElementsByName("text_info")[0];
+
+        let user = {
+            login: "",
+            password: "",
+            fullName: "",
+            gender: "",
+            languages: [],
+            target: "",
+            email: "",
+            additional: "",
+        }
+
+        // Инициализация полей формы
+        function initializeForm(userData) {
+            logInput.value = userData.login;
+            pasInput.value = userData.password;
+            pas2Input.value = userData.password; // В предположении, что повторный ввод пароля должен совпадать с основным паролем
+            fullNameInput.value = userData.fullName;
+            
+            // Инициализация выбранного пола
+            for (const genderInput of genderInputs) {
+                if (genderInput.value === userData.gender) {
+                    genderInput.checked = true;
+                    break;
+                }
+            }
+            
+            // Инициализация выбранных языков
+            const languageInputs2 = document.querySelectorAll("input[name^='check_languages_']");
+            for (const languageInput of languageInputs2) {
+                if (userData.languages.includes(languageInput.name)) {
+                    languageInput.checked = true;
+                }
+            }
+            
+            // Инициализация выбранной сферы деятельности
+            selectWork.selectedIndex[userData.target];
+            
+            // Инициализация e-mail
+            email.value = userData.email;
+            
+            // Инициализация дополнительной информации
+            addInfo.value = userData.additional;
+        }
+
+        let str = document.cookie;
+        if (str.length > 0) {
+            const cookies = str.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith("USER=")) {
+                    const userData = JSON.parse(decodeURIComponent(cookie.substring("USER=".length, cookie.length)));
+                    initializeForm(userData);
+                    break;
+                }
+            }
+        }
+
+
+        document.getElementById("subButton").addEventListener("click", function() {
+            // Проверка логина с использованием регулярного выражения
+            user.login = logInput.value;
+
+            const loginRegex = /^[a-zA-Z0-9]{4,}$/;
+            if (!loginRegex.test(user.login)) {
+                alert("Логин должен содержать только буквы и цифры, и иметь длину не менее 4 символов.");
+                return;
+            }
+
+            // Проверка пароля
+            user.password = pasInput.value;
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*_?&])[A-Za-z\d@$!%*_?&]{4,}$/;
+            if (!passwordRegex.test(user.password)) {
+                alert("Пароль должен быть не менее 4 символов и содержать как минимум одну заглавную и одну строчную букву, одну цифру и один специальный символ.");
+                return;
+            }
+            // Проверка совпадения паролей
+            if (user.password !== pas2Input.value) {
+                alert("Пароли не совпадают.");
+                return;
+            }
+
+            // Проверка имени
+            user.fullName = fullNameInput.value;
+            const nameRegex = /^[^0-9]{4,}$/;
+            if (!nameRegex.test(user.fullName)) {
+                alert("Имя должно содержать только буквы и иметь длину не менее 4 символов.");
+                return;
+            }
+            
+            // Проверка выбора пола
+            let genderSelected = false;
+            for (const genderInput of genderInputs) {
+                if (genderInput.checked) {
+                    user.gender = genderInput.value;
+                    genderSelected = true;
+                    break;
+                }
+            }
+            if (!genderSelected) {
+                alert("Выберите ваш пол.");
+                return;
+            }
+            
+            // Получение выбранных языков
+            const languageInputs = document.querySelectorAll("input[name^='check_languages_']:checked");
+            for (const languageInput of languageInputs) {
+                user.languages.push(languageInput.name);
+            }
+            
+            // Получение выбранной сферы деятельности
+            user.target = selectWork.options[selectWork.selectedIndex];
+            
+            // Проверка валидности email
+            user.email = email.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(user.email)) {
+                alert("Введите корректный email адрес.");
+                return;
+            }
+            // Получение дополнительной информации
+            user.additional = addInfo.value;
+
+            let d = new Date();
+            d.setMonth(d.getMonth() + 6);
+            document.cookie = "USER=" + encodeURIComponent(JSON.stringify(user)) + ";path=/;expires=" + d.toUTCString() + ";"
+        });
+    </script>
+</body>
+</html>
