@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Profile</title>
+<script src="https://kit.fontawesome.com/072742f38f.js" crossorigin="anonymous"></script>
+<style>
+  *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+
+  }
+
+  .header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logout-button {
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .logout-button:hover {
+    text-decoration: underline;
+  }
+
+  .logout-button:focus {
+    outline: none;
+  }
+
+  .logout-icon {
+    width: 16px;
+    height: 16px;
+    fill: #fff;
+    margin-right: 5px;
+  }
+
+  .profile-info {
+    margin: 20px auto;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+
+
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  input[type="tel"],
+  select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  input[type="text"]:focus,
+  input[type="tel"]:focus,
+  select:focus {
+    outline: none;
+    border-color: #4CAF50;
+  }
+
+  .button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    display: block;
+    margin-top: 10px;
+  }
+
+  .button:hover {
+    background-color: #45a049;
+  }
+
+  .error-message {
+    color: red;
+    display: none;
+    margin-top: -10px;
+    margin-bottom: 10px;
+  }
+
+  .error {
+    border-color: red;
+    box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.5);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span id="title-user">Welcome, John Doe</span>
+  <button id="logout-button" class="logout-button">
+      Logout
+      <i class="fa-solid fa-right-from-bracket" style="color: #61a81a;"></i>
+  </button>
+</div>
+
+<div class="profile-info">
+  <h1>User Profile</h1>
+  <form id="profile-form">
+    <div class="form-row">
+      <label for="firstName">First Name:</label>
+      <input type="text" id="firstName" name="firstName" required>
+    </div>
+
+    <div class="form-row">
+      <label for="lastName">Last Name:</label>
+      <input type="text" id="lastName" name="lastName" required>
+    </div>
+
+    <div class="form-row">
+      <label for="birthYear">Year of Birth:</label>
+      <input type="text" id="birthYear" name="birthYear" pattern="\d{4}" required>
+    </div>
+    <span class="error-message" id="birthYear-error">Please enter a valid year</span>
+
+    <div class="form-row">
+      <label for="gender">Gender:</label>
+      <select id="gender" name="gender" required>
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label for="phoneNumber">Phone Number:</label>
+      <input type="tel" id="phoneNumber" name="phoneNumber" pattern="[0-9]{10}" required>
+    </div>
+    <span class="error-message" id="phoneNumber-error">Please enter a valid phone number</span>
+
+    <div class="form-row">
+      <label for="skype">Skype:</label>
+      <input type="text" id="skype" name="skype" required>
+    </div>
+
+    <button type="submit" class="button">Save</button>
+  </form>
+</div>
+<script>
+    const welcomeTitle = document.getElementById("title-user");
+    const form = document.getElementById('profile-form');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const birthYearInput = document.getElementById('birthYear');
+    const genderSelect = document.getElementById('gender');
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const skypeInput = document.getElementById('skype');
+    const birthYearError = document.getElementById('birthYear-error');
+    const phoneNumberError = document.getElementById('phoneNumber-error');
+    const logoutButton = document.getElementById("logout-button");
+
+
+    let User = {
+        FirstName: "",
+        LastName: "",
+        BirthYear:"",
+        Gender: "",
+        Phone:"",
+        Skype:"",
+    }
+    function _initialization() {
+        let security = JSON.parse(localStorage.getItem('Security'));
+        welcomeTitle.innerText = "Welcome, " + security.Email;
+        // Установка значений из объекта User в соответствующие элементы формы
+        firstNameInput.value = User.FirstName;
+        lastNameInput.value = User.LastName;
+        birthYearInput.value = User.BirthYear;
+        genderSelect.value = User.Gender;
+        phoneNumberInput.value = User.Phone;
+        skypeInput.value = User.Skype;
+    }
+
+    function saveUser() {
+        // Сохранение значений из элементов формы в объект User
+        User.FirstName = firstNameInput.value;
+        User.LastName = lastNameInput.value;
+        User.BirthYear = birthYearInput.value;
+        User.Gender = genderSelect.value;
+        User.Phone = phoneNumberInput.value;
+        User.Skype = skypeInput.value;
+
+        // Сохранение объекта User в localStorage
+        localStorage.setItem('User', JSON.stringify(User));
+
+        alert("Save changes");
+    }
+    
+    function checkData() {
+        let valid = true;
+
+        // Проверка имени
+        const firstName = firstNameInput.value.trim();
+        if (!firstName.match(/^[a-zA-Z]+$/) || firstName.length > 20) {
+            firstNameInput.classList.add('error');
+            valid = false;
+        } else {
+            firstNameInput.classList.remove('error');
+        }
+
+        // Проверка фамилии
+        const lastName = lastNameInput.value.trim();
+        if (!lastName.match(/^[a-zA-Z]+$/) || lastName.length > 20) {
+            lastNameInput.classList.add('error');
+            valid = false;
+        } else {
+            lastNameInput.classList.remove('error');
+        }
+
+        // Проверка года рождения
+        const currentYear = new Date().getFullYear();
+        const birthYear = parseInt(birthYearInput.value.trim(), 10);
+        if (isNaN(birthYear) || birthYear < 1900 || birthYear > currentYear) {
+            birthYearError.style.display = 'block';
+            valid = false;
+        } else {
+            birthYearError.style.display = 'none';
+        }
+
+        // Проверка номера телефона
+        const phoneNumber = phoneNumberInput.value.replace(/\D/g, ''); // Удаляем все нецифровые символы
+        if (phoneNumber.length > 0 && (phoneNumber.length < 10 || phoneNumber.length > 12)) {
+            phoneNumberInput.classList.add('error');
+            valid = false;
+        } else {
+            phoneNumberInput.classList.remove('error');
+        }
+
+        // Проверка Skype
+        const skype = skypeInput.value.trim();
+        // Skype не имеет ограничений, поэтому нет необходимости проверять его
+
+        return valid;
+    }
+
+    // Обработка выхода
+    logoutButton.addEventListener('click', function() {
+        // Очистка localStorage и перенаправление на страницу выхода
+        localStorage.removeItem('User');
+        window.location.href = 'registration.html';
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем наличие данных в localStorage
+        if (!localStorage.getItem("Security")) {
+            // Если данные отсутствуют, перенаправляем пользователя на страницу регистрации
+            window.location.href = "registration.html";
+        } else {
+            // Если данные присутствуют, инициализируем профиль пользователя
+            const userData = localStorage.getItem('User');
+            if (userData) {
+                User = JSON.parse(userData);
+            }
+            _initialization();
+        }
+    });
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        if (checkData()){
+            saveUser();
+        }
+    });
+  
+  </script>
+</body>
+</html>
