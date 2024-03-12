@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(4, 150px);
+            grid-template-rows: repeat(4, 150px);
+            gap: 10px;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1), -5px -5px 15px rgba(255, 255, 255, 0.7);
+            transition: background-color 0.3s ease;
+        }
+
+        .emptyBlock, .block {
+            width: 100%;
+            height: 100%;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            color: #333;
+            font-weight: bold;
+            border-radius: 15px;
+            box-shadow: inset 5px 5px 15px rgba(0, 0, 0, 0.05), inset -5px -5px 15px rgba(255, 255, 255, 0.7);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .emptyBlock {
+            background-color: #f0f0f0;
+            color: #f0f0f0;
+            cursor: default;
+        }
+
+        .movesCounter {
+            font-size: 24px;
+            color: #ccc;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 5px 10px;
+            margin-bottom: 20px;
+        }
+
+
+        /* Дополнительные стили для темной темы */
+        body.darkTheme {
+            background-color: #222;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .darkTheme .container {
+            background-color: #222;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3), -5px -5px 15px rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .darkTheme .emptyBlock, .darkTheme .block {
+            background-color: #222;
+            color: #fff;
+            box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.3), inset -4px -4px 10px rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        .darkTheme .movesCounter {
+            border-color: #fff;
+            color: #fff;
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+
+        #changeTheme {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            color: #222;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            background: url('img/sun-solid.svg') no-repeat;
+            background-size: contain;
+            transition: background-color 0.3s ease;
+        }
+
+        #changeTheme:hover {
+            background-color: #ddd;
+            transition: background-color 0.3s ease;
+        }
+
+        .darkTheme #changeTheme {
+            background-image: url('img/moon-solid.svg');
+        }
+
+        .darkTheme #changeTheme:hover {
+            background-color: #333;
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <input type="button" id="changeTheme">
+
+    <div class="movesCounter">Ходов: <span id="moves">0</span></div>
+    <div class="container" id="cnt"></div>
+
+    <script>
+        $(document).ready(function(){
+            const changeThemeButton = $("#changeTheme");
+
+            // Проверяем, сохранена ли тема в localStorage
+            if (localStorage.getItem("theme") === "dark") {
+                $("body").addClass("darkTheme"); // Применяем темную тему
+            }
+
+            changeThemeButton.click(function() {
+                toggleTheme();
+            });
+
+            function toggleTheme() {
+                $("body").toggleClass("darkTheme");
+                // Сохраняем текущую тему в localStorage
+                if ($("body").hasClass("darkTheme")) {
+                    localStorage.setItem("theme", "dark");
+                } else {
+                    localStorage.setItem("theme", "light");
+                }
+            }
+
+            let empty;
+            let board;
+            let moves = $("#moves");
+
+            function fetchData(array) {
+                let cont = $("#cnt");
+                cont.html(""); // Очищаем содержимое контейнера
+
+                if (array === undefined)
+                    board = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0]);
+                    // board = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 15];
+                let x = 0;
+                let y = 0;
+                
+                // Проходимся по каждому элементу массива board и добавляем его в контейнер
+                board.forEach((number, index) => {
+                    // Создаем новый элемент с классом "block" и текстом, равным текущему числу
+                    let block = $("<div>");
+                    block.css("left", x);
+                    block.css("top", y);
+                    if (number === 0) {
+                        block.addClass("emptyBlock").text("");
+                        empty = block;
+                    }
+                    else{
+                        block.addClass("block").text(number).click(function() {
+                            move($(this));
+                        });
+                    }
+                    
+                    // Добавляем созданный блок внутрь контейнера
+                    cont.append(block);
+                    
+                    // Увеличиваем значение x на ширину блока
+                    x += block.width();
+                    
+                    // Если достигнут конец строки, переходим на следующую строку
+                    if ((index + 1) % 4 === 0) {
+                        x = 0;
+                        y += block.height();
+                    }
+                });
+            }
+            fetchData();
+
+            function shuffleArray(array) {
+                // Создаем копию массива, чтобы не менять оригинальный массив
+                let shuffledArray = array.slice();
+
+                // Проходимся по каждому элементу массива, начиная с последнего
+                for (let i = shuffledArray.length - 1; i > 0; i--) {
+                    // Генерируем случайный индекс от 0 до i
+                    const j = Math.floor(Math.random() * (i + 1));
+
+                    // Обмениваем значения между элементами с индексами i и j
+                    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+                }
+
+                // Возвращаем перемешанный массив
+                return shuffledArray;
+            }
+
+            function canMove(number){
+                const jump = 4;
+                const currentIndex = board.indexOf(number);
+                // $("#test2").text("Index: " + currentIndex);
+
+                if (currentIndex % 4 !== 0 && board[currentIndex - 1] === 0) {
+                    return { index: currentIndex - 1, direction: "left" };
+                }
+                else if ((currentIndex + 1) % 4 !== 0 && board[currentIndex + 1] === 0) {
+                    return { index: currentIndex + 1, direction: "right" };
+                }
+                else if (currentIndex >= jump && board[currentIndex - jump] === 0) {
+                    return { index: currentIndex - jump, direction: "up" };
+                }
+                else if (currentIndex < board.length - jump && board[currentIndex + jump] === 0) {
+                    return { index: currentIndex + jump, direction: "down" };
+                }
+                return { index: -1, direction: "" };
+            }
+
+            function move(clickedBlock) {
+                let number = +clickedBlock.text();
+                // $("#test").text("Number: " +number);
+                let result = canMove(number);
+                if (result.index !== -1){
+                    moveBlock(board.indexOf(number), result.index);
+                    moves.text(+moves.text()+1);
+                } 
+                if (checkWin()){
+                    alert("YOU WIN");
+                }
+            }
+
+            function checkWin() {
+                // Ожидаемая последовательность чисел
+                let expectedSequence = [...Array(15).keys()].map(i => i + 1);
+                
+                // Добавляем 0 в конец, чтобы учесть пустой блок
+                expectedSequence.push(0);
+
+                // Проверяем, совпадает ли массив board с ожидаемой последовательностью
+                for (let i = 0; i < board.length; i++) {
+                    if (board[i] !== expectedSequence[i]) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            function moveBlock(index1, index2) {
+                // Поменять местами значения в массиве
+                [board[index1], board[index2]] = [board[index2], board[index1]];
+
+                // Обновить интерфейс
+                fetchData(board);
+            }
+
+            // function moveBlock(index1, index2, dire) {
+            //     // Поменять местами значения в массиве
+            //     [board[index1], board[index2]] = [board[index2], board[index1]];
+
+            //     // Обновить интерфейс с анимацией
+            //     updateBlockPositions(index1, index2);
+            // }
+
+            // function updateBlockPositions(currentIndex, targetIndex, direction) {
+            //     // Получаем ширину и высоту блока
+            //     let blockWidth = $(".block").eq(currentIndex).width();
+            //     let blockHeight = $(".block").eq(currentIndex).height();
+
+            //     // Определяем смещение по координатам
+            //     let deltaX = 0;
+            //     let deltaY = 0;
+
+            //     // Вычисляем смещение в зависимости от направления
+            //     switch (direction) {
+            //         case "left":
+            //             deltaX = -blockWidth;
+            //             break;
+            //         case "right":
+            //             deltaX = blockWidth;
+            //             break;
+            //         case "up":
+            //             deltaY = -blockHeight;
+            //             break;
+            //         case "down":
+            //             deltaY = blockHeight;
+            //             break;
+            //     }
+
+            //     // Анимируем перемещение текущего блока
+            //     $(".block").eq(currentIndex).animate({
+            //         left: "+=" + deltaX + "px",
+            //         top: "+=" + deltaY + "px"
+            //     }, 500);
+
+            //     // Анимируем перемещение целевого блока
+            //     $(".block").eq(targetIndex).animate({
+            //         left: "-=" + deltaX + "px",
+            //         top: "-=" + deltaY + "px"
+            //     }, 500);
+            // }
+        });
+    </script>
+</body>
+</html>
