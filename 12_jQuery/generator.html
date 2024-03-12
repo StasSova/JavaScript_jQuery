@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            padding: 5%;
+            background-color: #1f1f1f;
+            color: whitesmoke;
+            font-size: 24px;
+        }
+        h1{
+            margin-bottom: 16px;
+        }
+        input{
+            font-size: 24px;
+        }
+        input[type="number"]{
+            width: auto;
+            margin: 8px 0;
+        }
+        #resInput{
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Random String Generator</h1>
+
+        <p>
+            String should be 
+            <input type="number" name="strLength" id="strLength" value="5">
+            characters long
+        </p>
+
+        <p>Which characters are allowed to occur in the strings?</p>
+        <div class="check-cont">
+
+            <div class="check-elem">
+                <input type="checkbox" name="chb-val-digits" id="chb-val-N">
+                <label for="chb-val-N">Numeric digits (0-9)</label>
+            </div>
+
+            <div class="check-elem">
+                <input type="checkbox" name="chb-val-up-letters" id="chb-val-U">
+                <label for="chb-val-U">Uppercase letters (A-Z)</label>
+            </div>
+
+            <div class="check-elem">
+                <input type="checkbox" name="chb-val-low-letters" id="chb-val-L">
+                <label for="chb-val-L">Lowercase letters (a-z)</label>
+            </div>
+        </div>
+        <input type="button" value="Generate" id="btn-gen">
+        <div>
+            <label for="resInput">Result: </label>
+            <input type="text" id="resInput">
+        </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+
+            $(document).ready(function(){
+                $('#btn-gen').bind("click", function(){
+                    let Length = Number.parseInt($('#strLength').val());
+                    if (isNaN(Length) || Length <= 0) {
+                        alert("Length should be a positive number");
+                        return;
+                    }
+                    let selected = [];
+                    $("[id^='chb-val-']:checked").each(function() {
+                        let id = $(this).attr('id');
+                        selected.push(id[id.length - 1]);
+                    });
+                    if (selected.length === 0){
+                        alert("Select at least one element");
+                        return;
+                    }
+
+                    let resultStr = "";
+                    for (let i = 0; i < Length; i++) {
+                        let randomIndex = Math.floor(Math.random() * selected.length);
+                        let randomElement = selected[randomIndex];
+                        switch (randomElement){
+                            case 'N':
+                                resultStr += Math.floor(Math.random() * 10); // Add random digit (0-9)
+                                break;
+                            case 'U':
+                                resultStr += String.fromCharCode(65 + Math.floor(Math.random() * 26)); // Add random uppercase letter (A-Z)
+                                break;
+                            case 'L':
+                                resultStr += String.fromCharCode(97 + Math.floor(Math.random() * 26)); // Add random lowercase letter (a-z)
+                                break;
+                        }
+                    }
+                    $('#resInput').val(resultStr);
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
