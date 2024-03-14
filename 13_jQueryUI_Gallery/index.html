@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-ui-1.13.2.custom/external/jquery/jquery.js"></script>
+    <script src="jquery-ui-1.13.2.custom/jquery-ui.js"></script>
+    <link rel="stylesheet" href="jquery-ui-1.13.2.custom/jquery-ui.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div id="container">
+        <div id="mainImage"></div>
+        <div id="cntImg"></div>
+
+        <input type="text" id="newImageUrl" placeholder="URL изображения">
+        <button id="addImageBtn">Добавить изображение</button>
+    </div>
+    <script>
+        $(document).ready(function(){
+            let bigImage;
+            const container = $("#container");
+            const cntImg = $("#cntImg");
+            let images; // Определите переменную images
+
+            // Вызываем функцию получения изображений
+            const initImages = async () =>{
+                try{
+                    let data = await getUrlPhotos();
+                    images = data.slice(1); // поулчаем все кроме первого
+                    const startImage = data[0];
+                    createImageElements(images, startImage); // Передаем images и startImage в функцию createImageElements
+                }catch(ex){
+                    console.log(ex);
+                }
+            }
+
+            // Функция для создания элементов изображений на странице
+            const createImageElements = (images, startImage) => {
+                images.forEach(src => {
+                    let div = $("<div>");
+                    div.addClass("card");
+                    div.css("background-image", `url(${src})`);
+                    div.bind("click", function(){
+                        _click($(this));
+                    });
+                    cntImg.append(div);
+                });
+                $("#mainImage").css("background-image", `url(${startImage})`);
+            };
+
+            // Вызываем функцию создания элементов изображений после того, как изображения загрузятся
+            initImages().catch(console.error);
+
+            function _click(img){
+                let imgUrl = img.css("background-image"); // Получить URL изображения
+                let bigUrl = $("#mainImage").css("background-image"); // Получить URL большого изображения
+
+                // Применение случайной анимации
+                let animations = ['blind', 'bounce', 'clip', 'drop', 'explode', 'fade', 'fold', 'highlight', 'puff', 'pulsate', 'scale', 'shake', 'size', 'slide', 'transfer'];
+                let randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+                
+                img.hide(randomAnimation, { duration: 400 }, function(){
+                    img.css("background-image", bigUrl).show(randomAnimation, { duration: 400 });
+                });
+
+                $("#mainImage").hide(randomAnimation, { duration: 400 }, function() {
+                    $("#mainImage").css("background-image", imgUrl).show(randomAnimation, { duration: 400 });
+                });
+
+            }
+            
+            $("#addImageBtn").click(function() {
+                let newImageUrl = $("#newImageUrl").val();
+                if (newImageUrl) {
+                    let div = $("<div>");
+                    div.addClass("card");
+                    div.css("background-image", `url(${newImageUrl})`);
+                    div.bind("click", function(){
+                        _click($(this));
+                    });
+                    cntImg.append(div);
+                    $("#newImageUrl").val(""); // Очистка поля ввода
+                } else {
+                    alert("Введите URL изображения");
+                }
+            });
+        });
+
+        
+    </script>
+
+
+    <script src="UnsplashAPI.js"></script>
+</body>
+</html>
+

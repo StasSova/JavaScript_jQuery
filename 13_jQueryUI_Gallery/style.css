@@ -1,0 +1,68 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #121212; /* Цвет фона */
+    color: #fff; /* Цвет текста */
+    font-family: Arial, sans-serif; /* Шрифт */
+    padding: 5%;
+}
+
+.card {
+    width: 100px;
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    margin: 5px;
+    cursor: pointer;
+    display: inline-block;
+    background-color: #333; /* Цвет карточек */
+    border-radius: 5px; /* Скругление углов */
+}
+
+#container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#mainImage {
+    width: calc(100% - 40px); /* 40px - ширина отступов */
+    max-width: 500px; /* Максимальная ширина главного изображения */
+    height: auto;
+    min-height: 500px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 20px;
+    background-color: transparent; /* Цвет главного изображения */
+    border-radius: 10px; /* Скругление углов */
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5); /* Тень */
+    margin-left: auto; /* Выравнивание по центру */
+    margin-right: auto; /* Выравнивание по центру */
+}
+
+#newImageUrl {
+    margin-top: 10px;
+    padding: 5px;
+    border: 1px solid #555; /* Цвет границы поля ввода */
+    background-color: #222; /* Цвет фона поля ввода */
+    color: #fff; /* Цвет текста в поле ввода */
+    border-radius: 5px; /* Скругление углов поля ввода */
+}
+
+#addImageBtn {
+    padding: 5px 10px;
+    margin-left: 5px;
+    border: none;
+    background-color: #007bff; /* Цвет кнопки */
+    color: #fff; /* Цвет текста на кнопке */
+    border-radius: 5px; /* Скругление углов кнопки */
+    cursor: pointer;
+}
+
+#addImageBtn:hover {
+    background-color: #0056b3; /* Цвет кнопки при наведении */
+}
