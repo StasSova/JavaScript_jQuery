@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container" id="btn-action">
+        <button class="uiverse">
+            <div class="wrapper">
+                <span id="btn-action-text"></span>
+                <div class="circle circle-12"></div>
+                <div class="circle circle-11"></div>
+                <div class="circle circle-10"></div>
+                <div class="circle circle-9"></div>
+                <div class="circle circle-8"></div>
+                <div class="circle circle-7"></div>
+                <div class="circle circle-6"></div>
+                <div class="circle circle-5"></div>
+                <div class="circle circle-4"></div>
+                <div class="circle circle-3"></div>
+                <div class="circle circle-2"></div>
+                <div class="circle circle-1"></div>
+            </div>
+        </button>
+        <p class="timeToLeft">Time left: <span>3:00</span></p>
+        <p class="moves">Moves: <span id="moves-value">0</span></p>
+    </div>
+    <div id="container"></div>
+
+    <script>
+        $(document).ready(function() {
+            let firstCard, secondCard,timerInterval;
+            let gameStarted = false;
+            let moves = 0;
+            const minutesOfGame = 1;
+            const secondsOfGame = 0;
+            const moves_text = $("#moves-value");
+            const container = $("#container");
+            $("#btn-action-text").text("Start");
+            $(".timeToLeft span").text(`${minutesOfGame}:${secondsOfGame.toString().padStart(2, '0')}`);
+    
+            function startGame() {
+                gameStarted = true;
+                $("#btn-action-text").text("Finish");
+                moves = 0;
+                moves_text.text(moves);
+    
+                initialBoard();
+                startTimer();
+            }
+    
+            function endGame() {
+                // Отображаем все карточки
+                $(".card").each(function() {
+                    const number = $(this).data("number");
+                    const imagePath = `img/${number}.png`;
+                    $(this).css("background-image", `url(${imagePath})`);
+                });
+
+                firstCard = undefined;
+                secondCard = undefined;
+
+                gameStarted = false;
+                $("#btn-action-text").text("Start");
+    
+                clearInterval(timerInterval);
+                $(".card").off("click");
+            }
+    
+            $("#btn-action").bind("click", function() {
+                if (gameStarted) {
+                    endGame();
+                } else {
+                    startGame();
+                }
+            });
+
+            function initialBoard() {
+                const board = shuffleArray([1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8]);
+                container.html(""); // Очищаем содержимое контейнера
+    
+                board.forEach((number, index) => {
+                    const card = $("<div>");
+                    card.addClass("card");
+                    card.addClass("hoverable");
+                    card.data("number", number);  // Сохраняем номер карточки в data-атрибуте
+                    card.bind("click", function() {
+                        _click($(this));
+                    });
+    
+                    container.append(card);
+                })
+            }
+            
+            function shuffleArray(array) {
+                // Создаем копию массива, чтобы не менять оригинальный массив
+                let shuffledArray = array.slice();
+    
+                // Проходимся по каждому элементу массива, начиная с последнего
+                for (let i = shuffledArray.length - 1; i > 0; i--) {
+                    // Генерируем случайный индекс от 0 до i
+                    const j = Math.floor(Math.random() * (i + 1));
+    
+                    // Обмениваем значения между элементами с индексами i и j
+                    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+                }
+    
+                // Возвращаем перемешанный массив
+                return shuffledArray;
+            }
+    
+            function _click(card) {
+                if (!gameStarted) return; // Не обрабатываем клики, если игра не началась
+                
+                if (card.is(firstCard) && !secondCard) {
+                    // Если пользователь нажал на ту же самую карточку, ничего не делаем
+                    return;
+                }
+                
+                if (secondCard) {
+                    // Сбрасываем фоновое изображение, если выбраны две разные карточки
+                    firstCard.css("background-image", "none");
+                    secondCard.css("background-image", "none");
+                    firstCard = undefined;
+                    secondCard = undefined;
+                }
+    
+                firstCard === undefined ? firstCard = card : secondCard = card;
+                const number = card.data("number");
+                const imagePath = `img/${number}.png`;
+
+                if (firstCard && secondCard && firstCard.data("number") === secondCard.data("number")) {
+                    // Удаляем обработчик события click для карточек, которые совпадают
+                    firstCard.off("click");
+                    secondCard.off("click");
+
+                    firstCard.css("background-color", "#1a1a1a");
+                    secondCard.css("background-color", "#1a1a1a");
+
+                    firstCard.removeClass("hoverable");
+                    secondCard.removeClass("hoverable");
+
+                    firstCard = undefined;
+                    secondCard = undefined;
+                } 
+    
+                card.css("background-image", `url(${imagePath})`);
+                
+                // Увеличиваем счетчик ходов
+                moves_text.text(Math.round(moves++/2));
+    
+                // Проверяем, завершена ли игра
+                checkGameCompletion();
+            }
+    
+            function checkGameCompletion() {
+                // Проверяем, сколько карточек осталось закрытыми (с background-image = "none")
+                const closedCards = $(".card").filter(function() {
+                    return $(this).css("background-image") === "none";
+                });
+
+                // Если не осталось закрытых карточек, то игра завершена
+                if (closedCards.length === 0) {
+                    endGame();
+                    alert("Congratulations! You've completed the game!");
+                }
+            }
+    
+            function startTimer() {
+                let minutes = minutesOfGame;
+                let seconds = secondsOfGame;
+                timerInterval = setInterval(function() {
+                    if (minutes === 0 && seconds === 0) {
+                        clearInterval(timerInterval);
+                        alert("Time's up!");
+    
+                        endGame();
+                        return;
+                    }
+    
+                    if (seconds === 0) {
+                        minutes--;
+                        seconds = 59;
+                    } else {
+                        seconds--;
+                    }
+    
+                    // Обновляем отображение времени
+                    $(".timeToLeft span").text(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
