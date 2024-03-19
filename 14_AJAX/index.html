@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <style>
+      .questionContainer {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 20px;
+      }
+      .answContainer {
+        padding: 10px;
+        display: grid;
+        grid-template-columns: 24px auto;
+        gap: 8px 12px;
+      }
+
+      .questionText {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .answCheckBox,
+      .answRadio {
+        margin-right: 5px;
+      }
+
+      .answLabel {
+        margin-right: 15px;
+        text-wrap: wrap;
+      }
+
+      .timer {
+        font-size: 24px;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <p id="TitleText"></p>
+    <div class="container" id="mainContainer"></div>
+    <p id="timer" class="timer"></p>
+    <input type="button" value="Ответить" id="btnNextQuest" />
+  </body>
+  <script>
+    $(function () {
+      $.ajax({
+        url: "quest.json",
+        type: "get",
+        success: function (data) {
+          onLoadSuccess(data);
+        },
+        // Функция, код которой будет выполнен если во время исполнения запроса произойдет ошибка.
+        error: function (jqXHR, statusText, error) {
+          alert(jqXHR.status + "\n" + statusText + "\n" + error);
+        },
+      });
+
+      const onLoadSuccess = (data) => {
+        console.log(data);
+        const questions = data["quest"];
+        console.log(questions);
+
+        function sha256(str) {
+          return new Promise((resolve, reject) => {
+            // Преобразуем строку в массив байт
+            const buffer = new TextEncoder("utf-8").encode(str);
+            // Хеш SHA-256
+            crypto.subtle
+              .digest("SHA-256", buffer)
+              .then((hash) => {
+                // Преобразуем хеш в строку шестнадцатеричных символов
+                let result = "";
+                const view = new DataView(hash);
+                for (let i = 0; i < hash.byteLength; i += 4) {
+                  result += ("00000000" + view.getUint32(i).toString(16)).slice(
+                    -8
+                  );
+                }
+                resolve(result);
+              })
+              .catch((error) => {
+                reject(error);
+              });
+          });
+        }
+
+        async function createHashes() {
+          for (const question of questions) {
+            for (const correctIndex of question.correctAnswers) {
+              const correctAnswer = question.options[correctIndex];
+              try {
+                const hash = await sha256(correctAnswer + "-" + correctAnswer);
+                console.log(hash + " --- " + correctAnswer);
+              } catch (error) {
+                console.error(error);
+              }
+            }
+          }
+        }
+
+        createHashes();
+
+        const timeToRound = 30;
+        let timeToEnd = timeToRound;
+        let timer = document.getElementById("timer");
+        let questionIndex = 0;
+        let Score = 0;
+
+        const but = document.getElementById("btnNextQuest");
+        but.addEventListener("click", onNextQuestionClick);
+
+        const title = document.getElementById("TitleText");
+        title.textContent = `Вопрос: ${questionIndex}\\${questions.length - 1}`;
+
+        let main = document.getElementById("mainContainer");
+        const questionElement = createQuestionElement(questions[questionIndex]);
+        main.appendChild(questionElement);
+
+        function createQuestionElement(question) {
+          // Создаем элемент для текста вопроса
+          const questionElement = document.createElement("div");
+          questionElement.classList.add("questionContainer");
+
+          // Добавляем текст вопроса
+          const questionText = document.createElement("p");
+          questionText.textContent = question.question;
+          questionText.classList.add("questionText");
+          questionElement.appendChild(questionText);
+
+          const answContainer = document.createElement("div");
+          answContainer.classList.add("answContainer");
+          // Проверяем, сколько правильных ответов
+          const numCorrectAnswers = question.correctAnswers.length;
+          // Если правильных ответов больше одного, используем checkbox
+          if (numCorrectAnswers > 1) {
+            question.options.forEach((option, index) => {
+              const checkbox = document.createElement("input");
+              checkbox.classList.add("answCheckBox");
+              checkbox.type = "checkbox";
+              checkbox.value = option;
+
+              checkbox.id = option.replace(/\s+/g, "-");
+
+              const label = document.createElement("label");
+              label.classList.add("answLabel");
+              label.textContent = option;
+              label.setAttribute("for", option.replace(/\s+/g, "-"));
+
+              answContainer.appendChild(checkbox);
+              answContainer.appendChild(label);
+            });
+          } else {
+            // Иначе используем radio
+            question.options.forEach((option, index) => {
+              const radio = document.createElement("input");
+
+              radio.type = "radio";
+              radio.classList.add("answRadio");
+              radio.value = option;
+              radio.name = "question-" + question.id;
+              radio.id = option.replace(/\s+/g, "-");
+
+              const label = document.createElement("label");
+              label.textContent = option;
+              label.classList.add("answLabel");
+              label.setAttribute("for", option.replace(/\s+/g, "-"));
+
+              answContainer.appendChild(radio);
+              answContainer.appendChild(label);
+            });
+          }
+          questionElement.appendChild(answContainer);
+          return questionElement;
+        }
+
+        // Функция, которая будет вызываться каждую секунду
+        function countdown() {
+          // Обновляем текстовое содержимое таймера
+          timer.textContent = `Осталось времени: ${timeToEnd} с.`;
+
+          // Уменьшаем время до окончания на одну секунду
+          timeToEnd--;
+
+          // Если время закончилось, очищаем интервал и выполняем необходимые действия
+          if (timeToEnd < 0) {
+            onNextQuestionClick();
+          }
+        }
+        // Запускаем таймер с интервалом 1 секунда (1000 миллисекунд)
+        let intervalId = setInterval(countdown, 1000);
+
+        async function checkAnswers(question) {
+          // Создаем переменную для подсчета правильных ответов
+          let correctAnswersCount = 0;
+
+          // Переменная для хранения количества выбранных ответов
+          let selectedAnswersCount = 0;
+
+          const answContainer = document.querySelector(".answContainer");
+          const answ = answContainer.querySelectorAll("input:checked");
+          for (let i = 0; i < answ.length; i++) {
+            const answer = answ[i];
+            selectedAnswersCount++;
+            // Проверяем, является ли выбранный ответ правильным
+            if (
+              question.correctAnswers.includes(
+                await sha256(answer.value + "-" + answer.value)
+              )
+            ) {
+              correctAnswersCount++;
+            } else {
+              // если есть один не правильный ответ - весь ответ не правильный.
+              correctAnswersCount = 0;
+              break;
+            }
+          }
+
+          // Если пользователь не выбрал ни одного ответа, считаем его ответ неправильным
+          if (selectedAnswersCount === 0 || correctAnswersCount === 0) {
+            return 0;
+          }
+
+          // Если количество выбранных правильных ответов совпадает с общим количеством правильных ответов
+          // или если выбран правильный ответ (в случае радиокнопок), то возвращаем 1 балл
+          if (
+            correctAnswersCount === question.correctAnswers.length &&
+            correctAnswersCount === selectedAnswersCount
+          ) {
+            return 1;
+          }
+
+          // Если количество выбранных правильных ответов меньше общего количества правильных ответов,
+          // то считаем долю правильных ответов от общего количества правильных ответов
+          return correctAnswersCount / question.correctAnswers.length;
+        }
+
+        async function onNextQuestionClick() {
+          // Получаем текущий вопрос
+          const currentQuestion = questions[questionIndex];
+
+          // Вызываем функцию для проверки ответов
+          const scoreForQuest = await checkAnswers(currentQuestion);
+
+          // Добавляем баллы
+          Score += scoreForQuest;
+
+          // Очищаем интервал
+          clearInterval(intervalId);
+
+          // Обнуляем таймер
+          timeToEnd = timeToRound;
+
+          // Удаляем старый вопрос
+          const questionElement = document.querySelector(".questionContainer");
+          questionElement.remove();
+
+          // Увеличиваем индекс для получения следующего вопроса
+          questionIndex += 1;
+
+          // Если достигнут конец списка вопросов, обнуляем индекс
+          if (questionIndex === questions.length) {
+            alert("Вы набрали " + Score + " баллов.");
+            title.remove();
+            timer.remove();
+            but.remove();
+            return;
+          }
+
+          // Создаем новый элемент для следующего вопроса
+          const nextQuestionElement = createQuestionElement(
+            questions[questionIndex]
+          );
+          main.appendChild(nextQuestionElement);
+
+          // Запускаем таймер снова
+          intervalId = setInterval(countdown, 1000);
+          title.textContent = `Вопрос: ${questionIndex}\\${
+            questions.length - 1
+          }`;
+        }
+      };
+    });
+  </script>
+</html>
