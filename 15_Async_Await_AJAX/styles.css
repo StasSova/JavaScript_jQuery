@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+textarea {
+  min-width: 400px;
+  height: 200px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin: 25px;
+}
+
+.result-block {
+  width: 400px;
+  min-height: 200px;
+  height: auto;
+  border: 1px solid #ccc;
+  overflow: auto;
+  padding: 10px;
+}

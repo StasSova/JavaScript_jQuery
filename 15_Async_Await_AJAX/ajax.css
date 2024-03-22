@@ -1,0 +1,105 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: black;
+  color: white;
+}
+
+.main {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 20px;
+}
+
+h1 {
+  color: white;
+  text-align: center;
+}
+
+#users_cont {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.user {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-detail {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: #333;
+  color: white;
+  margin-top: 25px;
+}
+
+.user-detail td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.user-detail tr:nth-child(even) {
+  background-color: #555; /* Темный оттенок для четных строк */
+}
+
+.user-detail tr:hover {
+  background-color: #666; /* При наведении */
+}
+
+.user-detail td:first-child {
+  font-weight: bold;
+  background-color: #222; /* Цвет фона для первой ячейки */
+}
+
+.btn {
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 30px; /* Добавляем отступ сверху */
+}
+
+.btn:hover {
+  background-color: #555; /* Цвет кнопки при наведении */
+}
+
+.post-container {
+  margin-top: 20px;
+}
+
+.post {
+  background-color: #444;
+  color: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.post h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.post p {
+  font-size: 16px;
+  line-height: 1.6;
+}
