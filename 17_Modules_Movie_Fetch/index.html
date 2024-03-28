@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="searchContainer">
+      <div id="searchPanel">
+        <h2>Search Movies</h2>
+        <form id="mainForm">
+          <input
+            type="text"
+            id="title-movie"
+            placeholder="Enter movie title..."
+          />
+          <select name="typeMovies" id="typeMovies">
+            <option value="movie" selected>Movie</option>
+            <option value="series">Series</option>
+            <option value="episode">Episode</option>
+          </select>
+          <input type="button" value="Search" id="searchButton" />
+        </form>
+      </div>
+      <div id="moviesList"></div>
+      <div class="pagination">
+        <button id="prevButton" disabled>Previous</button>
+        <button id="nextButton" disabled>Next</button>
+      </div>
+    </div>
+
+    <div id="movie-detail"></div>
+
+    <script>
+      $(document).ready(async function () {
+        const { MovieService } = await import("./MovieService.js");
+
+        const $moviesList = $("#moviesList");
+        const $prevButton = $("#prevButton");
+        const $nextButton = $("#nextButton");
+        let currentPage = 1;
+
+        $("#searchButton").click(async function () {
+          currentPage = 1;
+          let data = await MovieService.search(
+            $("#title-movie").val(),
+            $("#typeMovies").val(),
+            currentPage
+          );
+          addMovies(data);
+        });
+
+        $prevButton.click(async function () {
+          if (currentPage > 1) {
+            currentPage--;
+            let data = await MovieService.search(
+              $("#title-movie").val(),
+              $("#typeMovies").val(),
+              currentPage
+            );
+            addMovies(data);
+          }
+        });
+
+        $nextButton.click(async function () {
+          currentPage++;
+          let data = await MovieService.search(
+            $("#title-movie").val(),
+            $("#typeMovies").val(),
+            currentPage
+          );
+          addMovies(data);
+        });
+
+        const addMovies = (movies) => {
+          $moviesList.empty();
+          movies.forEach((movie) => {
+            const $movie = $("<div>").addClass("movie");
+            $movie.append(`<img src="${movie.Poster}" alt="${movie.Title}">`);
+            const $movieInfo = $("<div>").addClass("movie-info");
+            $movieInfo.append(
+              $("<div>").addClass("movie-title").text(movie.Title)
+            );
+            $movieInfo.append($("<div>").text(`Year: ${movie.Year}`));
+            $movieInfo.append($("<div>").text(`Type: ${movie.Type}`));
+            $movie.append($movieInfo);
+            $movie.click(function () {
+              showMovieDetails(movie.imdbID);
+            });
+            $moviesList.append($movie);
+          });
+          updatePaginationButtons();
+        };
+
+        const updatePaginationButtons = () => {
+          currentPage === 1
+            ? $prevButton.attr("disabled", true)
+            : $prevButton.attr("disabled", false);
+
+          currentPage >= 1
+            ? $nextButton.attr("disabled", false)
+            : $nextButton.attr("disabled", true);
+        };
+
+        const showMovieDetails = async (movieId) => {
+          try {
+            const movie = await MovieService.getMovie(movieId);
+            const $detailDiv = $("#movie-detail");
+            $detailDiv.empty();
+
+            const $title = $("<h2>").text(movie.Title);
+            const $poster = $("<img>")
+              .attr("src", movie.Poster)
+              .attr("alt", movie.Title);
+            const $plot = $("<p>").text(movie.Plot);
+            const $detailInfo = $("<div>").addClass("movie-detail-info");
+            $detailInfo.append($("<p>").text(`Year: ${movie.Year}`));
+            $detailInfo.append($("<p>").text(`Rated: ${movie.Rated}`));
+            $detailInfo.append($("<p>").text(`Released: ${movie.Released}`));
+            $detailInfo.append($("<p>").text(`Runtime: ${movie.Runtime}`));
+            $detailInfo.append($("<p>").text(`Genre: ${movie.Genre}`));
+            $detailInfo.append($("<p>").text(`Director: ${movie.Director}`));
+            $detailInfo.append(
+              $("<p>").text(`IMDb Rating: ${movie.imdbRating}`)
+            );
+
+            $detailDiv.append($title, $poster, $plot, $detailInfo);
+          } catch (error) {
+            console.error("Error fetching movie details:", error);
+          }
+        };
+      });
+    </script>
+  </body>
+</html>

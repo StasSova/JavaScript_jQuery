@@ -1,0 +1,70 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+#searchContainer {
+  display: flex;
+  flex-direction: column;
+  margin-right: 20px;
+}
+
+#searchPanel {
+  margin-bottom: 20px;
+  width: 300px;
+}
+
+#moviesList {
+  width: 300px;
+}
+
+#movie-detail {
+  width: 300px;
+  border: 1px solid #ccc;
+  padding: 20px;
+}
+
+.movie {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.movie:hover {
+  background-color: #f0f0f0;
+}
+
+.movie img {
+  width: 80px;
+  height: 120px;
+  margin-right: 10px;
+}
+
+.movie-info {
+  flex-grow: 1;
+}
+
+.movie-title {
+  font-weight: bold;
+}
+
+.movie-detail-info {
+  margin-bottom: 10px;
+}
+
+.movie-detail-info h2 {
+  margin-top: 0;
+}
+
+.pagination {
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin-right: 5px;
+}
